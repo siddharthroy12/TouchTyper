@@ -20,7 +20,7 @@ int main(void) {
     context.theme.cursor = {153, 214, 234, 255};
     context.theme.wrong = RED;
     context.theme.correct = {126, 186, 181, 255};
-    context.sentence = "end for also world better right now if you can me do that what now for etc hello then life than when where";
+    context.sentence = "end for also world better right now if you can me do that what now for etc hello then life than when where for arrow node python c++ this dotnet dot com google facebook amazon netflix reddit";
     context.font = LoadFontEx("assets/mononoki-Regular.ttf", 28, nullptr, 0);
 
     while (!WindowShouldClose()) {
