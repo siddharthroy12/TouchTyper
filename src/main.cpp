@@ -1,29 +1,58 @@
 #include "../libs/raylib/src/raylib.h"
+#include "Context.hpp"
+#include "Theme.hpp"
+#include "typingTest.hpp"
+#include <iostream>
 
-#define SCREEN_WIDTH (800)
-#define SCREEN_HEIGHT (450)
+char getInputCharacter() {
+    int key = GetKeyPressed();
+    std::cout << key << std::endl;
+    return 0;
+}
 
-int main(void)
-{
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window title");
+int main(void) {
+    InitWindow(800, 450, "TouchTyper");
+    SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
     SetTargetFPS(60);
+    Context context;
+    context.theme.background = {12, 13, 17, 255};
+    context.theme.text = {69, 72, 100, 255};
+    context.theme.cursor = {153, 214, 234, 255};
+    context.theme.wrong = RED;
+    context.theme.correct = {126, 186, 181, 255};
+    context.sentence = "end for also world better right now if you can me do that what now for etc hello then life than when where";
+    context.font = LoadFontEx("assets/mononoki-Regular.ttf", 28, nullptr, 0);
 
-    Texture2D texture = LoadTexture("assets/test.png");
+    while (!WindowShouldClose()) {
+        context.screenHeight = GetScreenHeight();
+        context.screenWidth = GetScreenWidth();
 
-    while (!WindowShouldClose())
-    {
+        int key = GetCharPressed();
+
+        if (IsKeyPressed(KEY_BACKSPACE)) {
+            if (context.input.size()) {
+                // Delete whole word
+                if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+                    while (context.input.size() && context.input[context.input.size()-1] == ' ' ) {
+                        context.input.pop_back();
+                    }
+
+                    while ((context.input[context.input.size()-1] != ' ') && context.input.size()) {
+                        context.input.pop_back();
+                    }
+                } else {
+                    context.input.pop_back();
+                }
+            }
+        }
+
+        if (key && (context.input.size() < context.sentence.size())) {
+            context.input += key;
+        }
+
         BeginDrawing();
-
-        ClearBackground(RAYWHITE);
-
-        const int texture_x = SCREEN_WIDTH / 2 - texture.width / 2;
-        const int texture_y = SCREEN_HEIGHT / 2 - texture.height / 2;
-        DrawTexture(texture, texture_x, texture_y, WHITE);
-
-        const char* text = "OMG! IT WORKS!";
-        const Vector2 text_size = MeasureTextEx(GetFontDefault(), text, 20, 1);
-        DrawText(text, SCREEN_WIDTH / 2 - text_size.x / 2, texture_y + texture.height + text_size.y + 10, 20, BLACK);
-
+        ClearBackground({12, 13, 17, 255});
+        typingTest(context);
         EndDrawing();
     }
 
