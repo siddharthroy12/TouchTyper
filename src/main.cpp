@@ -1,7 +1,9 @@
 #include "../libs/raylib/src/raylib.h"
 #include "Context.hpp"
 #include "Theme.hpp"
+#include "constants.hpp"
 #include "typingTest.hpp"
+#include "header.hpp"
 #include <iostream>
 
 char getInputCharacter() {
@@ -21,7 +23,10 @@ int main(void) {
     context.theme.wrong = RED;
     context.theme.correct = {126, 186, 181, 255};
     context.sentence = "end for also world better right now if you can me do that what now for etc hello then life than when where for arrow node python c++ this dotnet dot com google facebook amazon netflix reddit";
-    context.font = LoadFontEx("assets/mononoki-Regular.ttf", 28, nullptr, 0);
+    context.typingTestFontData.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf", 32, nullptr, 0);
+    context.typingTestFontData.size = 32;
+    context.titleFontData.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf", 40, nullptr, 0);
+    context.titleFontData.size = 40;
 
     while (!WindowShouldClose()) {
         context.screenHeight = GetScreenHeight();
@@ -52,6 +57,7 @@ int main(void) {
 
         BeginDrawing();
         ClearBackground({12, 13, 17, 255});
+        header(context);
         typingTest(context);
         EndDrawing();
     }

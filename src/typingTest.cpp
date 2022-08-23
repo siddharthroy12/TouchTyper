@@ -3,21 +3,21 @@
 #include <vector>
 #include <cmath>
 #include "../libs/raylib/src/raymath.h"
+#include "constants.hpp"
 
-#define MAX_WIDTH 900
-#define FONT_SIZE 28
-
-Vector2 cursorPostion = Vector2{0, 0};
-Vector2 newCursorPosition = Vector2{0, 0};
+Vector2 cursorPostion = {0, 0};
+Vector2 newCursorPosition = {0, 0};
 int yOffset = 0;
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
-    Vector2 sizeOfCharacter = MeasureTextEx(context.font, "a", FONT_SIZE, 1);
+    Vector2 sizeOfCharacter = MeasureTextEx(context.typingTestFontData.font,
+                                            "a",
+                                            context.typingTestFontData.size, 1);
 
     // To make it responsive
-    int width = std::min(context.screenWidth, MAX_WIDTH);
-    int height = sizeOfCharacter.y * 3; 
+    int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
+    int height = sizeOfCharacter.y * 3;
 
     // Center of the screen
     Vector2 center = getCenter(context.screenWidth, context.screenHeight);
@@ -71,7 +71,11 @@ void typingTest(Context &context) {
                 if (index == context.input.size()-1) {
                     newCursorPosition = currentPositon;
                     yOffset = (line * sizeOfCharacter.y) - sizeOfCharacter.y;
-                    DrawRectangle(cursorPostion.x, currentPositon.y, sizeOfCharacter.x, sizeOfCharacter.y, context.theme.cursor);
+                    DrawRectangle(cursorPostion.x,
+                                  currentPositon.y,
+                                  sizeOfCharacter.x,
+                                  sizeOfCharacter.y,
+                                  context.theme.cursor);
                 }
 
 
@@ -81,16 +85,24 @@ void typingTest(Context &context) {
                         color = context.theme.correct;
                     } else {
                         color = context.theme.wrong;
-                        c = std::string(1, context.input[index+1]);
 
                         if (c == std::string(" ")) {
-                            DrawRectangle(currentPositon.x, currentPositon.y, sizeOfCharacter.x, sizeOfCharacter.y, context.theme.wrong);
+                            DrawRectangle(currentPositon.x,
+                                          currentPositon.y,
+                                          sizeOfCharacter.x,
+                                          sizeOfCharacter.y,
+                                          context.theme.wrong);
                         }
                     }
                 }
 
                 // Draw the text
-                DrawTextEx(context.font, c.c_str(), currentPositon, FONT_SIZE, 1, color);
+                DrawTextEx(context.typingTestFontData.font,
+                           c.c_str(),
+                           currentPositon,
+                           context.typingTestFontData.size,
+                           1,
+                           color);
 
                 currentPositon.x += sizeOfCharacter.x;
                 index++;

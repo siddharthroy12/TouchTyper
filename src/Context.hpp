@@ -4,6 +4,11 @@
 #include "../libs/raylib/src/raylib.h"
 #include "Theme.hpp"
 
+struct FontData {
+    Font font;
+    int size;
+};
+
 struct Context {
     int screenWidth;
     int screenHeight;
@@ -11,7 +16,8 @@ struct Context {
     std::string sentence;
     std::string input;
     int cpm;
-    Font font;
+    FontData titleFontData;
+    FontData typingTestFontData;
     Theme theme;
 };
 
