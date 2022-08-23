@@ -1,43 +1,55 @@
 #include "../libs/raylib/src/raylib.h"
 #include "Context.hpp"
-#include "Theme.hpp"
 #include "constants.hpp"
 #include "typingTest.hpp"
 #include "header.hpp"
 #include <iostream>
 #include <vector>
+#include <bits/stdc++.h>
 
-char getInputCharacter() {
-    int key = GetKeyPressed();
-    std::cout << key << std::endl;
-    return 0;
+double getTimeInMin() {
+    return GetTime()/60;
 }
 
 int main(void) {
-    InitWindow(800, 450, "TouchTyper");
+    InitWindow(800, 450, PROJECT_NAME);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
-    SetTargetFPS(60);
+    //SetTargetFPS(60);
     Context context;
     context.theme.background = {12, 13, 17, 255};
     context.theme.text = {69, 72, 100, 255};
     context.theme.cursor = {153, 214, 234, 255};
     context.theme.wrong = RED;
     context.theme.correct = {126, 186, 181, 255};
+    context.theme.highlight = RAYWHITE;
     context.sentence = "end for also world better right now if you can me do that what now for etc hello then life than when where for arrow node python c++ this dotnet dot com google facebook amazon netflix reddit";
-    context.typingTestFontData.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf", 32, nullptr, 0);
-    context.typingTestFontData.size = 32;
-    context.titleFontData.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf", 40, nullptr, 0);
-    context.titleFontData.size = 40;
-    std::vector<double> deltas(context.sentence.size());
-    double previousTypedTime = GetTime(); // In seconds
-    int cpm;
-    int typed = 0;
+    context.fonts.typingTestFont.size = 32;
+    context.fonts.typingTestFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
+                                                   context.fonts.typingTestFont.size, nullptr, 0);
+    context.fonts.titleFont.size = 40;
+    context.fonts.titleFont.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf",
+                                              context.fonts.titleFont.size, nullptr, 0);
+    context.fonts.tinyFont.size = 18;
+    context.fonts.tinyFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
+                                             context.fonts.tinyFont.size, nullptr, 0);
+    std::unordered_set<int> visitedIndexes;
+    double testStartTime = 0; // In Minute
+    int incorrecLetters = 0;
+    int correctLetters = 0;
 
     while (!WindowShouldClose()) {
         context.screenHeight = GetScreenHeight();
         context.screenWidth = GetScreenWidth();
 
         int key = GetCharPressed();
+
+        if (context.mouseOnClickable) {
+            SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+        } else {
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+        }
+
+        context.mouseOnClickable = false;
 
         if (IsKeyPressed(KEY_BACKSPACE)) {
             if (context.input.size()) {
@@ -60,25 +72,27 @@ int main(void) {
         if (key && (context.input.size() < context.sentence.size())) {
             context.input += key;
 
-            // Calculate delta time for each character
-            if (deltas[context.input.size()-1] == 0) {
-                deltas[context.input.size()-1] = GetTime() - previousTypedTime;
-                typed++;
+            if (context.input.size() == 1) {
+                testStartTime = getTimeInMin();
+            }
 
-                if (typed == 1) {
-                    previousTypedTime = GetTime();
+            // Calculate correct and incorrect typed letters
+            if (visitedIndexes.find(context.input.size()-1) == visitedIndexes.end()) {
+                if (context.input[context.input.size()-1] != context.sentence[context.input.size()-1]) {
+                    incorrecLetters++;
+                } else {
+                    correctLetters++;
                 }
             }
-            previousTypedTime = GetTime();
+            visitedIndexes.insert(context.input.size()-1);
         }
 
-        double sum = 0;
-        for (auto el : deltas) {
-            sum += el;
-        }
+        // Calculate wpm
+        double cpm = correctLetters / (getTimeInMin() - testStartTime);
+        double wpm = (correctLetters/5.0) / (getTimeInMin() - testStartTime);
 
-        // Calculate average wpm
-        std::cout << "WPM: " << (((1 / (sum / typed)) * 60) / 5) << std::endl;
+        context.cpm = cpm;
+        context.wpm = wpm;
 
         BeginDrawing();
         ClearBackground({12, 13, 17, 255});

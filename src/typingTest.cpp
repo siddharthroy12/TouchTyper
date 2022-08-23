@@ -7,12 +7,13 @@
 
 Vector2 cursorPostion = {0, 0};
 Vector2 newCursorPosition = {0, 0};
+float cursorSpeed = 20;
 int yOffset = 0;
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
-    Vector2 sizeOfCharacter = MeasureTextEx(context.typingTestFontData.font, "a",
-                                            context.typingTestFontData.size, 1);
+    Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.typingTestFont.font, "a",
+                                            context.fonts.typingTestFont.size, 1);
 
     // To make it responsive
     int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
@@ -31,12 +32,22 @@ void typingTest(Context &context) {
 
     std::string word;
 
-    // Draw Container
+    // Draw WPM
+    Vector2 liveScoreTextPos;
+    liveScoreTextPos.y = startingPosition.y - sizeOfCharacter.y + yOffset;
+    liveScoreTextPos.x = startingPosition.x;
+
+    DrawTextEx(context.fonts.typingTestFont.font,
+               TextFormat("WPM: %d", context.wpm),
+               liveScoreTextPos, context.fonts.typingTestFont.size, 1, context.theme.text);
+
+
+    // Begin Drawing sentence
     BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height);
 
     // Animate cursor
-    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, 0.5);
-    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, 0.5);
+    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, cursorSpeed * GetFrameTime());
+    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, cursorSpeed * GetFrameTime());
 
     // To keep track of current line
     int line = 1;
@@ -73,7 +84,7 @@ void typingTest(Context &context) {
                 if (index == context.input.size()-1) {
                     newCursorPosition = currentPositon;
                     yOffset = (line * sizeOfCharacter.y) - sizeOfCharacter.y;
-                    DrawRectangle(cursorPostion.x, currentPositon.y,
+                    DrawRectangle(cursorPostion.x+1, currentPositon.y,
                                   sizeOfCharacter.x, sizeOfCharacter.y,
                                   context.theme.cursor);
                 }
@@ -97,8 +108,8 @@ void typingTest(Context &context) {
                 }
 
                 // Draw the text
-                DrawTextEx(context.typingTestFontData.font, c.c_str(),
-                           currentPositon, context.typingTestFontData.size,
+                DrawTextEx(context.fonts.typingTestFont.font, c.c_str(),
+                           currentPositon, context.fonts.typingTestFont.size,
                            1, color);
 
                 currentPositon.x += sizeOfCharacter.x;
