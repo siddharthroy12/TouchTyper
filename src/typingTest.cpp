@@ -11,8 +11,7 @@ int yOffset = 0;
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
-    Vector2 sizeOfCharacter = MeasureTextEx(context.typingTestFontData.font,
-                                            "a",
+    Vector2 sizeOfCharacter = MeasureTextEx(context.typingTestFontData.font, "a",
                                             context.typingTestFontData.size, 1);
 
     // To make it responsive
@@ -33,7 +32,7 @@ void typingTest(Context &context) {
     std::string word;
 
     // Draw Container
-    BeginScissorMode(startingPosition.x, startingPosition.y + yOffset, width, height);
+    BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height);
 
     // Animate cursor
     cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, 0.5);
@@ -61,6 +60,9 @@ void typingTest(Context &context) {
             // Index of the character where the cursor should be
             int index = i - word.size();
 
+            Vector2 underlineStart = currentPositon;
+            underlineStart.y += sizeOfCharacter.y;
+            bool wordMistake = false;
 
             // Draw each character
             for (auto character : word) {
@@ -71,13 +73,10 @@ void typingTest(Context &context) {
                 if (index == context.input.size()-1) {
                     newCursorPosition = currentPositon;
                     yOffset = (line * sizeOfCharacter.y) - sizeOfCharacter.y;
-                    DrawRectangle(cursorPostion.x,
-                                  currentPositon.y,
-                                  sizeOfCharacter.x,
-                                  sizeOfCharacter.y,
+                    DrawRectangle(cursorPostion.x, currentPositon.y,
+                                  sizeOfCharacter.x, sizeOfCharacter.y,
                                   context.theme.cursor);
                 }
-
 
                 // Check if the input is correct or wrong
                 if (index+1 < context.input.size()) {
@@ -85,27 +84,33 @@ void typingTest(Context &context) {
                         color = context.theme.correct;
                     } else {
                         color = context.theme.wrong;
+                        if (context.sentence[index+1] != ' ') {
+                            wordMistake = true;
+                        }
 
                         if (c == std::string(" ")) {
-                            DrawRectangle(currentPositon.x,
-                                          currentPositon.y,
-                                          sizeOfCharacter.x,
-                                          sizeOfCharacter.y,
+                            DrawRectangle(currentPositon.x, currentPositon.y,
+                                          sizeOfCharacter.x, sizeOfCharacter.y,
                                           context.theme.wrong);
                         }
                     }
                 }
 
                 // Draw the text
-                DrawTextEx(context.typingTestFontData.font,
-                           c.c_str(),
-                           currentPositon,
-                           context.typingTestFontData.size,
-                           1,
-                           color);
+                DrawTextEx(context.typingTestFontData.font, c.c_str(),
+                           currentPositon, context.typingTestFontData.size,
+                           1, color);
 
                 currentPositon.x += sizeOfCharacter.x;
                 index++;
+            }
+
+            Vector2 underlineEnd = currentPositon;
+            underlineEnd.y += sizeOfCharacter.y;
+            underlineEnd.x -= sizeOfCharacter.x;
+
+            if (wordMistake) {
+                DrawLineEx(underlineStart, underlineEnd, 2, RED);
             }
 
             word = "";
