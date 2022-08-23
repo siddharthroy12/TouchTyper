@@ -5,7 +5,7 @@
 #include "header.hpp"
 #include <iostream>
 #include <vector>
-#include <bits/stdc++.h>
+#include <unordered_set>
 
 double getTimeInMin() {
     return GetTime()/60;
