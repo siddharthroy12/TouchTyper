@@ -5,6 +5,7 @@
 #include "typingTest.hpp"
 #include "header.hpp"
 #include <iostream>
+#include <vector>
 
 char getInputCharacter() {
     int key = GetKeyPressed();
@@ -27,6 +28,10 @@ int main(void) {
     context.typingTestFontData.size = 32;
     context.titleFontData.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf", 40, nullptr, 0);
     context.titleFontData.size = 40;
+    std::vector<double> deltas(context.sentence.size());
+    double previousTypedTime = GetTime(); // In seconds
+    int cpm;
+    int typed = 0;
 
     while (!WindowShouldClose()) {
         context.screenHeight = GetScreenHeight();
@@ -36,7 +41,8 @@ int main(void) {
 
         if (IsKeyPressed(KEY_BACKSPACE)) {
             if (context.input.size()) {
-                // Delete whole word
+
+                // CTRL + Backspace
                 if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
                     while (context.input.size() && context.input[context.input.size()-1] == ' ' ) {
                         context.input.pop_back();
@@ -45,7 +51,7 @@ int main(void) {
                     while ((context.input[context.input.size()-1] != ' ') && context.input.size()) {
                         context.input.pop_back();
                     }
-                } else {
+                } else { // Normal Backspace
                     context.input.pop_back();
                 }
             }
@@ -53,7 +59,26 @@ int main(void) {
 
         if (key && (context.input.size() < context.sentence.size())) {
             context.input += key;
+
+            // Calculate delta time for each character
+            if (deltas[context.input.size()-1] == 0) {
+                deltas[context.input.size()-1] = GetTime() - previousTypedTime;
+                typed++;
+
+                if (typed == 1) {
+                    previousTypedTime = GetTime();
+                }
+            }
+            previousTypedTime = GetTime();
         }
+
+        double sum = 0;
+        for (auto el : deltas) {
+            sum += el;
+        }
+
+        // Calculate average wpm
+        std::cout << "WPM: " << (((1 / (sum / typed)) * 60) / 5) << std::endl;
 
         BeginDrawing();
         ClearBackground({12, 13, 17, 255});

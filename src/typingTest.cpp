@@ -43,7 +43,7 @@ void typingTest(Context &context) {
 
     for (int i = 0; i < context.sentence.size(); i++) {
         // Detect the end of the word
-        if (context.sentence[i] == ' ' or i == (context.sentence.size() - 1)) {
+        if (context.sentence[i] == ' ' || i == (context.sentence.size() - 1)) {
             // Add that ending space character too
             word += context.sentence[i];
 
@@ -110,7 +110,7 @@ void typingTest(Context &context) {
             underlineEnd.x -= sizeOfCharacter.x;
 
             if (wordMistake) {
-                DrawLineEx(underlineStart, underlineEnd, 2, RED);
+                DrawLineEx(underlineStart, underlineEnd, 2, context.theme.wrong);
             }
 
             word = "";
