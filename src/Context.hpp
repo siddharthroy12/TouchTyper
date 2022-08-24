@@ -1,6 +1,7 @@
 #ifndef CONTEXT_HPP
 #define CONTEXT_HPP
 #include <string>
+#include <vector>
 #include "../libs/raylib/src/raylib.h"
 
 struct FontData {
@@ -31,6 +32,8 @@ struct TestSettings {
     bool usePunctuation = false;
     bool useNumbers = false;
     TestMode testMode = TestMode::TIME;
+    std::vector<int> testModeAmounts = {120, 60, 30, 15};
+    int selectedAmount = 0;
     int time = 60;
     int words = 100;
 };
@@ -39,6 +42,7 @@ struct Context {
     int screenWidth;
     int screenHeight;
     Screen currentScreen;
+    std::vector<std::string> words;
     std::string sentence;
     std::string input;
     double testStartTime = 0;

@@ -1,14 +1,16 @@
 #include "header.hpp"
 #include "constants.hpp"
 #include "helpers.hpp"
+#include <string>
 #include <vector>
 
 std::vector<std::string> firstOptions = {"numbers", "punctuation"};
 std::vector<std::string> secondOptions = {"words", "time"};
 
+void options(Context &context, std::vector<std::string> &options, Vector2 &startingPosition, Vector2 &sizeOfCharacter, bool isAmounts) {
+    for (int i = 0; i < options.size(); i++) {
+        auto word = options[i];
 
-void options(Context &context, std::vector<std::string> &options, Vector2 &startingPosition, Vector2 &sizeOfCharacter) {
-    for (auto word : options) {
         Vector2 optionPosition = startingPosition;
         optionPosition.x -= word.size() * sizeOfCharacter.x;
         Color color = context.theme.text;
@@ -33,13 +35,21 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
                     context.testSettings.testMode = TestMode::TIME;
                 }
 
+                if (isAmounts) {
+                    context.testSettings.selectedAmount = i;
+                }
+
+                if (context.currentScreen == Screen::TEST) {
+                    restartTest(context);
+                }
             }
         }
 
         if ((word == firstOptions[1] && context.testSettings.usePunctuation) ||
             (word == firstOptions[0] && context.testSettings.useNumbers) ||
             (word == secondOptions[1] && context.testSettings.testMode == TestMode::TIME) ||
-            (word == secondOptions[0] && context.testSettings.testMode == TestMode::WORDS)) {
+            (word == secondOptions[0] && context.testSettings.testMode == TestMode::WORDS) ||
+            (isAmounts && i == context.testSettings.selectedAmount)) {
             color = context.theme.correct;
         }
 
@@ -75,8 +85,19 @@ void header(Context &context) {
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
             context.fonts.tinyFont.size, 1);
 
-    options(context, firstOptions, startingPosition, sizeOfCharacter);
+    options(context, firstOptions, startingPosition, sizeOfCharacter, false);
     startingPosition = topRightPosition;
     startingPosition.y += sizeOfCharacter.y;
-    options(context, secondOptions, startingPosition, sizeOfCharacter);
+    options(context, secondOptions, startingPosition, sizeOfCharacter, false);
+
+    startingPosition.x = topRightPosition.x;
+    startingPosition.y += sizeOfCharacter.y;
+
+    std::vector<std::string> thirdOptions;
+    for (auto option : context.testSettings.testModeAmounts) {
+        thirdOptions.push_back(std::to_string(option));
+    }
+
+    options(context, thirdOptions, startingPosition, sizeOfCharacter, true);
+
 }

@@ -25,7 +25,6 @@ void result(Context &context) {
         {"raw", TextFormat("%d", context.raw)},
     };
 
-
     float totalWidth = 0;
 
     for (auto score : scores) {
@@ -45,6 +44,4 @@ void result(Context &context) {
         drawMonospaceText(context.fonts.typingTestFont.font, score[0], nPosition, context.fonts.typingTestFont.size, context.theme.text);
         position.x += (score[1].size() * sizeOfCharacter.x) + sizeOfCharacter.x;
     }
-
-    
 }

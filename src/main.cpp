@@ -38,6 +38,12 @@ int main(void) {
     int incorrecLetters = 0;
     int correctLetters = 0;
 
+    if (!getFileContent("assets/word_lists/english_1k.txt", context.words)) {
+        return 1;
+    }
+
+    restartTest(context);
+
     while (!WindowShouldClose()) {
         context.screenHeight = GetScreenHeight();
         context.screenWidth = GetScreenWidth();
@@ -55,8 +61,15 @@ int main(void) {
             restartTest(context);
         }
 
+        if (context.testRunning) {
+            int time = (int)((getTimeInMin() - context.testStartTime)*60);
+            if (time >= context.testSettings.testModeAmounts[context.testSettings.selectedAmount]) {
+                endTest(context);
+            }
+        }
+
         BeginDrawing();
-        ClearBackground({12, 13, 17, 255});
+        ClearBackground(context.theme.background);
         header(context);
 
         if (context.currentScreen == Screen::TEST) {
@@ -87,9 +100,7 @@ int main(void) {
                 }
 
                 if (context.testRunning && context.input.size() == context.sentence.size()) {
-                    context.testRunning = false;
-                    context.currentScreen = Screen::RESULT;
-                    context.testEndTime = getTimeInMin();
+                    endTest(context);
                 }
 
                 // Calculate correct and incorrect typed letters
@@ -119,6 +130,23 @@ int main(void) {
         } else if (context.currentScreen == Screen::RESULT) {
             result(context);
         }
+
+        // Draw shortcut
+        std::string shortcut = "enter - restart test";
+        Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
+            context.fonts.tinyFont.size, 1);
+
+        Vector2 position = getCenter(context.screenWidth, context.screenHeight);
+        position.y = context.screenHeight - (PADDING + sizeOfCharacter.y);
+        position.x -= (sizeOfCharacter.x*shortcut.size())/2.0;
+        Rectangle rec;
+        rec.x = position.x-4;
+        rec.y = position.y-2;
+        rec.height = (sizeOfCharacter.y) + 4;
+        rec.width = (sizeOfCharacter.x * 5) + 8;
+        drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
+        DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
+        drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
 
         EndDrawing();
     }

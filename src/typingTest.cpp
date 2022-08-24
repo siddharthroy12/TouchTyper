@@ -17,7 +17,6 @@ void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.typingTestFont.font, "a",
                                             context.fonts.typingTestFont.size, 1);
-
     // To make it responsive
     int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
     int height = sizeOfCharacter.y * 3;
@@ -54,7 +53,7 @@ void typingTest(Context &context) {
     }
 
     drawMonospaceText(context.fonts.typingTestFont.font,
-               TextFormat("Time: %d WPM:%ds", time, wpmToShow),
+               TextFormat("Time: %ds WPM:%d", time, wpmToShow),
                liveScoreTextPos, context.fonts.typingTestFont.size, context.theme.text);
 
     // Begin Drawing sentence
