@@ -43,13 +43,8 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
             color = context.theme.correct;
         }
 
-        for (auto letter : word) {
-            std::string c(1, letter);
-            DrawTextEx(context.fonts.tinyFont.font,
-                c.c_str(), optionPosition,
-                context.fonts.tinyFont.size, 1, color);
-            optionPosition.x += sizeOfCharacter.x;
-        }
+        drawMonospaceText(context.fonts.tinyFont.font, word, optionPosition, context.fonts.tinyFont.size, color);
+        optionPosition.x += sizeOfCharacter.x * word.size();
 
         startingPosition = optionPosition;
         startingPosition.x -= word.size() * sizeOfCharacter.x + sizeOfCharacter.x;

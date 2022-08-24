@@ -12,6 +12,7 @@ struct Fonts {
     FontData titleFont;
     FontData typingTestFont;
     FontData tinyFont;
+    FontData bigFont;
 };
 
 struct Theme {
@@ -24,6 +25,7 @@ struct Theme {
 };
 
 enum class TestMode { TIME, WORDS };
+enum class Screen { TEST, RESULT };
 
 struct TestSettings {
     bool usePunctuation = false;
@@ -36,11 +38,16 @@ struct TestSettings {
 struct Context {
     int screenWidth;
     int screenHeight;
-    float deltaTime;
+    Screen currentScreen;
     std::string sentence;
     std::string input;
-    int cpm;
-    int wpm;
+    double testStartTime = 0;
+    bool testRunning = false;
+    double testEndTime = 0;
+    int wpm = 0;
+    int cpm = 0;
+    int raw = 0;
+    int accuracy = 0;
     Fonts fonts;
     Theme theme;
     TestSettings testSettings;

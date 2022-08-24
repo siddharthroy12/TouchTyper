@@ -9,6 +9,9 @@ Vector2 cursorPostion = {0, 0};
 Vector2 newCursorPosition = {0, 0};
 float cursorSpeed = 20;
 int yOffset = 0;
+float wpmUpdateDelay = 0.5;
+float wpmUpdateTimer = 0;
+int wpmToShow = 0;
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
@@ -37,10 +40,22 @@ void typingTest(Context &context) {
     liveScoreTextPos.y = startingPosition.y - sizeOfCharacter.y + yOffset;
     liveScoreTextPos.x = startingPosition.x;
 
-    DrawTextEx(context.fonts.typingTestFont.font,
-               TextFormat("WPM: %d", context.wpm),
-               liveScoreTextPos, context.fonts.typingTestFont.size, 1, context.theme.text);
+    int time = context.testRunning ? (int)((getTimeInMin() - context.testStartTime)*60) : 0;
 
+    wpmUpdateTimer += GetFrameTime();
+
+    if (wpmUpdateTimer > wpmUpdateDelay) {
+        wpmToShow = context.wpm;
+        wpmUpdateTimer = 0;
+    }
+
+    if (!context.testRunning) {
+        wpmToShow = 0;
+    }
+
+    drawMonospaceText(context.fonts.typingTestFont.font,
+               TextFormat("Time: %d WPM:%ds", time, wpmToShow),
+               liveScoreTextPos, context.fonts.typingTestFont.size, context.theme.text);
 
     // Begin Drawing sentence
     BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height);
