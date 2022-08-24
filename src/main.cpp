@@ -7,12 +7,14 @@
 #include "result.hpp"
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include <unordered_set>
 
 int main(void) {
     InitWindow(800, 450, PROJECT_NAME);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
     //SetTargetFPS(60);
+
     Context context;
     context.theme.background = {12, 13, 17, 255};
     context.theme.text = {69, 72, 100, 255};
@@ -34,7 +36,7 @@ int main(void) {
     context.fonts.bigFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
             context.fonts.bigFont.size, nullptr, 0);
 
-    std::unordered_set<int> visitedIndexes;
+    int furthestVisitedIndex = -1;
     int incorrecLetters = 0;
     int correctLetters = 0;
 
@@ -63,7 +65,8 @@ int main(void) {
 
         if (context.testRunning) {
             int time = (int)((getTimeInMin() - context.testStartTime)*60);
-            if (time >= context.testSettings.testModeAmounts[context.testSettings.selectedAmount]) {
+            if (time >= context.testSettings.testModeAmounts[context.testSettings.selectedAmount] &&
+                    context.testSettings.testMode == TestMode::TIME) {
                 endTest(context);
             }
         }
@@ -99,19 +102,28 @@ int main(void) {
                     context.testStartTime = getTimeInMin();
                 }
 
+                // Once the sentence is complete end the test
                 if (context.testRunning && context.input.size() == context.sentence.size()) {
                     endTest(context);
                 }
 
-                // Calculate correct and incorrect typed letters
-                if (visitedIndexes.find(context.input.size()-1) == visitedIndexes.end()) {
+                // Calculate correct and incorrect typed letters and add more words as we type
+                if (context.input.size() > furthestVisitedIndex) {
                     if (context.input[context.input.size()-1] != context.sentence[context.input.size()-1]) {
                         incorrecLetters++;
                     } else {
                         correctLetters++;
                     }
+
+                    if (context.testSettings.testMode == TestMode::TIME) {
+                        if (context.sentence[context.input.size()-1] == ' ') {
+                            context.sentence += ' ';
+                            context.sentence += generateSentence(context, 1);
+                        }
+                    }
                 }
-                visitedIndexes.insert(context.input.size()-1);
+
+                furthestVisitedIndex = std::max(furthestVisitedIndex, (int)context.input.size());
             }
 
             // Calculate score
@@ -132,9 +144,9 @@ int main(void) {
         }
 
         // Draw shortcut
-        std::string shortcut = "enter - restart test";
+        std::string shortcut = "enter  - restart test";
         Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-            context.fonts.tinyFont.size, 1);
+                context.fonts.tinyFont.size, 1);
 
         Vector2 position = getCenter(context.screenWidth, context.screenHeight);
         position.y = context.screenHeight - (PADDING + sizeOfCharacter.y);

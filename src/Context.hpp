@@ -33,7 +33,7 @@ struct TestSettings {
     bool useNumbers = false;
     TestMode testMode = TestMode::TIME;
     std::vector<int> testModeAmounts = {120, 60, 30, 15};
-    int selectedAmount = 0;
+    int selectedAmount = 1;
     int time = 60;
     int words = 100;
 };
