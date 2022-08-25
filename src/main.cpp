@@ -10,6 +10,24 @@
 #include <cmath>
 #include <unordered_set>
 
+int getWindowWidth() {
+    if (IsWindowFullscreen()) {
+        return GetMonitorWidth(GetCurrentMonitor());
+    }
+    else {
+        return GetScreenWidth();
+    }
+}
+
+int getWindowHeight() {
+    if (IsWindowFullscreen()) {
+        return GetMonitorHeight(GetCurrentMonitor());
+    }
+    else {
+        return GetScreenHeight();
+    }
+}
+
 int main(void) {
     InitWindow(800, 450, PROJECT_NAME);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
@@ -43,8 +61,26 @@ int main(void) {
     restartTest(context, false);
 
     while (!WindowShouldClose()) {
-        context.screenHeight = GetScreenHeight();
-        context.screenWidth = GetScreenWidth();
+        context.screenHeight = getWindowHeight();
+        context.screenWidth = getWindowWidth();
+
+        if (IsKeyPressed(KEY_F11)) {
+            // see what display we are on right now
+
+            if (IsWindowFullscreen())
+            {
+                SetWindowSize(context.screenWidth, context.screenHeight);
+                ToggleFullscreen();
+            }
+            else
+            {
+
+                ToggleFullscreen();
+                int monitor = GetCurrentMonitor();
+                SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+            }
+
+        }
 
         int key = GetCharPressed();
 
