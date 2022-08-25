@@ -1,3 +1,20 @@
+ain't
+aren't
+can't
+couldn't
+didn't
+doesn't
+don't
+hadn't
+hasn't
+haven't
+isn't
+mightn't
+mustn't
+needn't
+shouldn't
+wasn't
+won't
 the
 of
 to
@@ -995,4 +1012,3 @@ quotient
 teeth
 shell
 neck
-e

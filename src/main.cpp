@@ -36,15 +36,11 @@ int main(void) {
     context.fonts.bigFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
             context.fonts.bigFont.size, nullptr, 0);
 
-    int furthestVisitedIndex = -1;
-    int incorrecLetters = 0;
-    int correctLetters = 0;
-
     if (!getFileContent("assets/word_lists/english_1k.txt", context.words)) {
         return 1;
     }
 
-    restartTest(context);
+    restartTest(context, false);
 
     while (!WindowShouldClose()) {
         context.screenHeight = GetScreenHeight();
@@ -60,11 +56,11 @@ int main(void) {
         context.mouseOnClickable = false;
 
         if (IsKeyPressed(KEY_ENTER)) {
-            restartTest(context);
+            restartTest(context, IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
         }
 
         if (context.testRunning) {
-            int time = (int)((getTimeInMin() - context.testStartTime)*60);
+            int time = (int)((GetTime() - context.testStartTime));
             if (time >= context.testSettings.testModeAmounts[context.testSettings.selectedAmount] &&
                     context.testSettings.testMode == TestMode::TIME) {
                 endTest(context);
@@ -97,9 +93,9 @@ int main(void) {
             if (key && (context.input.size() < context.sentence.size())) {
                 context.input += key;
 
-                if (context.input.size() == 1) {
+                if (context.input.size() == 1 && !context.testRunning) {
                     context.testRunning = true;
-                    context.testStartTime = getTimeInMin();
+                    context.testStartTime = GetTime();
                 }
 
                 // Once the sentence is complete end the test
@@ -108,11 +104,11 @@ int main(void) {
                 }
 
                 // Calculate correct and incorrect typed letters and add more words as we type
-                if (context.input.size() > furthestVisitedIndex) {
+                if (context.input.size() > context.furthestVisitedIndex) {
                     if (context.input[context.input.size()-1] != context.sentence[context.input.size()-1]) {
-                        incorrecLetters++;
+                        context.incorrecLetters++;
                     } else {
-                        correctLetters++;
+                        context.correctLetters++;
                     }
 
                     if (context.testSettings.testMode == TestMode::TIME) {
@@ -123,18 +119,16 @@ int main(void) {
                     }
                 }
 
-                furthestVisitedIndex = std::max(furthestVisitedIndex, (int)context.input.size());
+                context.furthestVisitedIndex = std::max(context.furthestVisitedIndex, (int)context.input.size());
             }
 
             // Calculate score
-            if (context.testRunning && (getTimeInMin()-context.testStartTime) > 0.03) {
-                double cpm = correctLetters / (getTimeInMin() - context.testStartTime);
-                double wpm = (correctLetters/5.0) / (getTimeInMin() - context.testStartTime);
-                double raw = ((correctLetters+incorrecLetters)/5.0) / (getTimeInMin() - context.testStartTime);
-                context.cpm = cpm;
+            if (context.testRunning && (GetTime()-context.testStartTime) > 3) {
+                double wpm = (context.correctLetters) * (60 / (GetTime() - context.testStartTime)) / 5.0;
+                double raw = (context.correctLetters+context.incorrecLetters) * (60 / (GetTime() - context.testStartTime)) / 5.0;
                 context.wpm = wpm;
                 context.raw = raw;
-                context.accuracy = ((float)(correctLetters) / (correctLetters + incorrecLetters)) * 100;
+                context.accuracy = ((float)(context.correctLetters) / (context.correctLetters + context.incorrecLetters)) * 100;
             }
 
             typingTest(context);
@@ -144,7 +138,7 @@ int main(void) {
         }
 
         // Draw shortcut
-        std::string shortcut = "enter  - restart test";
+        std::string shortcut = "enter  - new test";
         Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
                 context.fonts.tinyFont.size, 1);
 
@@ -159,6 +153,22 @@ int main(void) {
         drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
         DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
         drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
+
+        shortcut = "shift  +  enter  -  repeat test";
+        position.x  = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x*shortcut.size())/2.0;
+        position.y -= sizeOfCharacter.y + 10;
+        drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
+        rec.x = position.x-4;
+        rec.y = position.y-2;
+        rec.width = (sizeOfCharacter.x * 5) + 8;
+        DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
+        drawMonospaceText(context.fonts.tinyFont.font, "shift", position, context.fonts.tinyFont.size, context.theme.background);
+        position.x += sizeOfCharacter.x * 10;
+        rec.x = position.x-4;
+        rec.width = (sizeOfCharacter.x * 5) + 8;
+        DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
+        drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
+
 
         EndDrawing();
     }

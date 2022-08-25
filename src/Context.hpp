@@ -51,6 +51,9 @@ struct Context {
     int wpm = 0;
     int cpm = 0;
     int raw = 0;
+    int incorrecLetters = 0;
+    int correctLetters = 0;
+    int furthestVisitedIndex = -1;
     int accuracy = 0;
     Fonts fonts;
     Theme theme;

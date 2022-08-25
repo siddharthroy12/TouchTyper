@@ -40,7 +40,7 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
                 }
 
                 if (context.currentScreen == Screen::TEST) {
-                    restartTest(context);
+                    restartTest(context, false);
                 }
             }
         }
@@ -76,9 +76,31 @@ void header(Context &context) {
     topRightPosition.y = PADDING;
 
     // Draw Title
+    Color color;
+    std::string text;
+    if (!context.testRunning) {
+        color = context.theme.correct;
+        switch (context.currentScreen) {
+            case Screen::TEST:
+                text = "Start Typing";
+                break;
+            case Screen::RESULT:
+                text = "Result";
+                break;
+        }
+    } else {
+        color = context.theme.text;
+        if (context.testSettings.testMode == TestMode::WORDS) {
+            text = TextFormat("%d/%d", context.input.size(), context.sentence.size());
+        } else {
+            text = TextFormat("%ds", (int)(GetTime() - context.testStartTime));
+        }
+    }
+
     DrawTextEx(context.fonts.titleFont.font,
-            PROJECT_NAME, topLeftPosition,
-            context.fonts.titleFont.size, 1, WHITE);
+            text.c_str(), topLeftPosition,
+            context.fonts.titleFont.size, 1, color);
+
 
     // Draw Options
     Vector2 startingPosition = topRightPosition;

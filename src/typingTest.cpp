@@ -9,9 +9,13 @@ Vector2 cursorPostion = {0, 0};
 Vector2 newCursorPosition = {0, 0};
 float cursorSpeed = 20;
 int yOffset = 0;
-float wpmUpdateDelay = 0.5;
-float wpmUpdateTimer = 0;
-int wpmToShow = 0;
+
+std::vector<std::vector<char>> keyboard = {
+    {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
+    {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';','\''},
+    {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'},
+    // Space here
+};
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
@@ -27,34 +31,29 @@ void typingTest(Context &context) {
     // Where the first character will be placed
     Vector2 startingPosition;
     startingPosition.x = center.x - width/2.0;
-    startingPosition.y = (center.y - height/2.0) - yOffset;
+    startingPosition.y = (center.y - height/2.0) - yOffset - 100;
+    if (startingPosition.y < 95) {
+        startingPosition.y = 95;
+    }
+    startingPosition.y -= yOffset;
 
     // Positions of character of the sentence on the screen
     Vector2 currentPositon = startingPosition;
 
     std::string word;
 
-    // Draw WPM
+    // Draw live Score
+    /*
     Vector2 liveScoreTextPos;
     liveScoreTextPos.y = startingPosition.y - sizeOfCharacter.y + yOffset;
     liveScoreTextPos.x = startingPosition.x;
 
-    int time = context.testRunning ? (int)((getTimeInMin() - context.testStartTime)*60) : 0;
-
-    wpmUpdateTimer += GetFrameTime();
-
-    if (wpmUpdateTimer > wpmUpdateDelay) {
-        wpmToShow = context.wpm;
-        wpmUpdateTimer = 0;
-    }
-
-    if (!context.testRunning) {
-        wpmToShow = 0;
-    }
+    int time = context.testRunning ? ((GetTime() - context.testStartTime)) : 0;
 
     drawMonospaceText(context.fonts.typingTestFont.font,
-               TextFormat("Time: %ds WPM:%d", time, wpmToShow),
+               TextFormat("Time: %ds WPM:%d", time, context.wpm),
                liveScoreTextPos, context.fonts.typingTestFont.size, context.theme.text);
+    */
 
     // Begin Drawing sentence
     BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height);
@@ -145,5 +144,31 @@ void typingTest(Context &context) {
     }
 
     EndScissorMode();
+
+    // Draw Keybaord
+    const int sizeOfKey = 30;
+    const int margin = 0;
+
+    for (int i = 0; i < keyboard.size(); i++) {
+        auto row = keyboard[i];
+        int totalWidth = sizeOfKey * keyboard[i].size();
+        Vector2 position;
+        position.x = center.x - (totalWidth/2.0);
+        position.y = (startingPosition.y + (sizeOfCharacter.y * 5)) + (sizeOfKey * i);
+
+        for (auto key : row) {
+            Rectangle rect;
+            rect.x = position.x;
+            rect.y = position.y;
+            rect.width = sizeOfKey;
+            rect.height = sizeOfKey;
+            DrawRectangleRoundedLines(rect, 0.1, 5, 1, context.theme.text);
+            Vector2 keyPosition;
+            keyPosition.x = (sizeOfKey/2.0) - (sizeOfCharacter.x/2.0);
+
+            //drawMonospaceText(context.fonts.tinyFont.font, key, position, context.fonts.tinyFont.size, context.theme.background);
+            position.x += sizeOfKey;
+        }
+    }
 
 }

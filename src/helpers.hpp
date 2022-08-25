@@ -13,7 +13,7 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
 
 double getTimeInMin();
 
-void restartTest(Context &context);
+void restartTest(Context &context, bool repeat);
 
 void endTest(Context &context);
 
