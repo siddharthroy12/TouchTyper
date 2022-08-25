@@ -31,7 +31,7 @@ void typingTest(Context &context) {
     // Where the first character will be placed
     Vector2 startingPosition;
     startingPosition.x = center.x - width/2.0;
-    startingPosition.y = (center.y - height/2.0) - yOffset - 100;
+    startingPosition.y = (center.y - height/2.0) - 100;
     if (startingPosition.y < 95) {
         startingPosition.y = 95;
     }
@@ -146,28 +146,36 @@ void typingTest(Context &context) {
     EndScissorMode();
 
     // Draw Keybaord
-    const int sizeOfKey = 30;
-    const int margin = 0;
+    const int sizeOfKey = 35;
+    const int margin = 5;
+    sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
+                                            context.fonts.tinyFont.size, 1);
+    startingPosition.y += yOffset;
 
     for (int i = 0; i < keyboard.size(); i++) {
         auto row = keyboard[i];
-        int totalWidth = sizeOfKey * keyboard[i].size();
+        int totalWidth = (sizeOfKey * keyboard[i].size()) + margin * (keyboard[i].size()-1);
         Vector2 position;
         position.x = center.x - (totalWidth/2.0);
-        position.y = (startingPosition.y + (sizeOfCharacter.y * 5)) + (sizeOfKey * i);
+        position.y = (startingPosition.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
 
         for (auto key : row) {
+            std::string c(1, key);
             Rectangle rect;
             rect.x = position.x;
             rect.y = position.y;
             rect.width = sizeOfKey;
             rect.height = sizeOfKey;
             DrawRectangleRoundedLines(rect, 0.1, 5, 1, context.theme.text);
+            if (IsKeyDown(toupper(key))) {
+                DrawRectangleRounded(rect, 0.1, 5, context.theme.correct);
+            }
             Vector2 keyPosition;
-            keyPosition.x = (sizeOfKey/2.0) - (sizeOfCharacter.x/2.0);
+            keyPosition.x = (rect.x + (sizeOfKey/2.0)) - (sizeOfCharacter.x/2.0);
+            keyPosition.y = (rect.y + (sizeOfKey/2.0)) - (sizeOfCharacter.y/2.0);
+            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, context.theme.text);
 
-            //drawMonospaceText(context.fonts.tinyFont.font, key, position, context.fonts.tinyFont.size, context.theme.background);
-            position.x += sizeOfKey;
+            position.x += sizeOfKey + margin;
         }
     }
 

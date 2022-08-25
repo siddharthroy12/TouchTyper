@@ -169,7 +169,6 @@ int main(void) {
         DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
         drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
 
-
         EndDrawing();
     }
 
