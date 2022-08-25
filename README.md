@@ -1,4 +1,4 @@
-![Demo](./demo/demo.mp4)
+![Demo](https://j.gifs.com/79klZ8.gif)
 
 ![](https://github.com/siddharthroy12/TouchTyper/actions/workflows/nativebuild.yml/badge.svg)
 ![](https://github.com/siddharthroy12/TouchTyper/actions/workflows/webbuild.yml/badge.svg)
