@@ -129,7 +129,7 @@ void header(Context &context) {
 
     // Draw progress bar
     float barWidth = 0;
-    barHeight = Lerp(barHeight, targetBarHeight, 0.01);
+    barHeight = Lerp(barHeight, targetBarHeight, GetFrameTime()*4);
     float percentage = 0;
     int amount = context.testSettings.testModeAmounts[context.testSettings.selectedAmount];
 

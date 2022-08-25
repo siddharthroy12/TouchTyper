@@ -56,7 +56,7 @@ void typingTest(Context &context) {
     */
 
     // Begin Drawing sentence
-    BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height);
+    BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height > 1 ? height : 1);
 
     // Animate cursor
     cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, cursorSpeed * GetFrameTime());
