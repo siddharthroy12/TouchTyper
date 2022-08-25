@@ -1,3 +1,0 @@
-[submodule "libs/raylib"]
-	path = libs/raylib
-	url = https://github.com/raysan5/raylib
