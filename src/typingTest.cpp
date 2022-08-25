@@ -96,7 +96,7 @@ void typingTest(Context &context) {
                 // Draw cursor
                 if (index == context.input.size()-1) {
                     newCursorPosition = currentPositon;
-                    yOffset = (line * sizeOfCharacter.y) - sizeOfCharacter.y;
+                    yOffset = line > 2 ? ((line-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
                     DrawRectangle(cursorPostion.x+1, currentPositon.y,
                                   sizeOfCharacter.x, sizeOfCharacter.y,
                                   context.theme.cursor);

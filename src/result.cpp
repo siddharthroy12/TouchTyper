@@ -16,7 +16,7 @@ void result(Context &context) {
     std::vector<std::vector<std::string>> scores = {
         {"wpm", TextFormat("%d", context.wpm)},
         {"raw", TextFormat("%d", context.raw)},
-        {"acc", TextFormat("%d", context.accuracy)},
+        {"acc", TextFormat("%d\%%", context.accuracy)},
         {"time", TextFormat("%ds", (int)((context.testEndTime - context.testStartTime)))},
     };
 

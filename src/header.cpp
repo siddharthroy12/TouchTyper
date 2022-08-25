@@ -3,9 +3,12 @@
 #include "helpers.hpp"
 #include <string>
 #include <vector>
+#include "../libs/raylib/src/raymath.h"
 
 std::vector<std::string> firstOptions = {"numbers", "punctuation"};
 std::vector<std::string> secondOptions = {"words", "time"};
+float targetBarHeight = 0;
+float barHeight = 0;
 
 void options(Context &context, std::vector<std::string> &options, Vector2 &startingPosition, Vector2 &sizeOfCharacter, bool isAmounts) {
     for (int i = 0; i < options.size(); i++) {
@@ -95,6 +98,8 @@ void header(Context &context) {
         } else {
             text = TextFormat("%ds", (int)(GetTime() - context.testStartTime));
         }
+
+        text += " " + std::to_string(context.wpm);
     }
 
     DrawTextEx(context.fonts.titleFont.font,
@@ -121,5 +126,28 @@ void header(Context &context) {
     }
 
     options(context, thirdOptions, startingPosition, sizeOfCharacter, true);
+
+    // Draw progress bar
+    float barWidth = 0;
+    barHeight = Lerp(barHeight, targetBarHeight, 0.01);
+    float percentage = 0;
+    int amount = context.testSettings.testModeAmounts[context.testSettings.selectedAmount];
+
+    if (context.testRunning) {
+        targetBarHeight = 5;
+    } else {
+        targetBarHeight = 0;
+    }
+
+    switch (context.testSettings.testMode) {
+        case TestMode::TIME:
+            percentage = (GetTime() - context.testStartTime) / (float)amount;
+            break;
+        case TestMode::WORDS:
+            percentage = (context.furthestVisitedIndex+1.0) / context.sentence.size();
+            break;
+    }
+
+    DrawRectangle(0, 0, context.screenWidth * percentage, barHeight, context.theme.correct);
 
 }

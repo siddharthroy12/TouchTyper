@@ -174,7 +174,7 @@ int main(void) {
         }
 
         // Draw shortcut
-        std::string shortcut = "enter  - new test";
+        std::string shortcut = "shift  +  enter  - new test";
         Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
                 context.fonts.tinyFont.size, 1);
 
@@ -188,16 +188,6 @@ int main(void) {
         rec.width = (sizeOfCharacter.x * 5) + 8;
         drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
         DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
-        drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
-
-        shortcut = "shift  +  enter  -  repeat test";
-        position.x  = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x*shortcut.size())/2.0;
-        position.y -= sizeOfCharacter.y + 10;
-        drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
-        rec.x = position.x-4;
-        rec.y = position.y-2;
-        rec.width = (sizeOfCharacter.x * 5) + 8;
-        DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
         drawMonospaceText(context.fonts.tinyFont.font, "shift", position, context.fonts.tinyFont.size, context.theme.background);
         position.x += sizeOfCharacter.x * 10;
         rec.x = position.x-4;
@@ -205,6 +195,15 @@ int main(void) {
         DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
         drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
 
+        shortcut = "enter  -  repeat test";
+        position.x  = getCenter(context.screenWidth, context.screenHeight).x - (sizeOfCharacter.x*shortcut.size())/2.0;
+        position.y -= sizeOfCharacter.y + 10;
+        drawMonospaceText(context.fonts.tinyFont.font, shortcut.c_str(), position, context.fonts.tinyFont.size, context.theme.text);
+        rec.x = position.x-4;
+        rec.y = position.y-2;
+        rec.width = (sizeOfCharacter.x * 5) + 8;
+        DrawRectangleRounded(rec, 0.2, 5, context.theme.text);
+        drawMonospaceText(context.fonts.tinyFont.font, "enter", position, context.fonts.tinyFont.size, context.theme.background);
         EndDrawing();
     }
 
