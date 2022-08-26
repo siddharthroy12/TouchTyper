@@ -2,9 +2,11 @@
 #define CONSTANTS
 
 #ifndef PROJECT_NAME
+#define PROJECT_NAME "UwU"
+#endif
 
-#define PROJECT_NAME "TouchTyper"
-
+#ifndef VERSION
+#define VERSION "N/A"
 #endif
 
 #define MAX_WIDTH 900

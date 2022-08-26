@@ -33,10 +33,12 @@ void result(Context &context) {
     position.y = center.y - (sizeOfCharacter.y/2.0);
 
     for (auto score : scores) {
-        drawMonospaceText(context.fonts.bigFont.font, score[1], position, context.fonts.bigFont.size, context.theme.correct);
+        Color color = context.theme.correct;
+        drawMonospaceText(context.fonts.bigFont.font, score[1], position, context.fonts.bigFont.size, color);
         Vector2 nPosition = position;
         nPosition.y -= context.fonts.typingTestFont.size/2.0;
-        drawMonospaceText(context.fonts.typingTestFont.font, score[0], nPosition, context.fonts.typingTestFont.size, context.theme.text);
+        color = context.theme.text;
+        drawMonospaceText(context.fonts.typingTestFont.font, score[0], nPosition, context.fonts.typingTestFont.size, color);
         position.x += (score[1].size() * sizeOfCharacter.x) + sizeOfCharacter.x;
     }
 }
