@@ -19,7 +19,7 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
     }
 }
 
-template<class BidiIter >
+template<class BidiIter>
 BidiIter random_unique(BidiIter begin, BidiIter end, size_t num_random) {
     size_t left = std::distance(begin, end);
     while (num_random--) {
@@ -41,15 +41,16 @@ char quotes[3][2] = {
     {'(', ')'}
 };
 
-std::string generateSentence(Context &context, int words) {
+std::string generateSentence(Context &context, int numberOfWords) {
+    auto words = context.wordsLists[context.selectedWordList].words;
     std::string output = "";
 
     // Shuffle the amount of words we need
-    random_unique(context.words.begin(), context.words.end(), words);
+    random_unique(words.begin(), words.end(), numberOfWords);
 
     // Put the words in the senctence
-    for(int i = 0; i < words; ++i) {
-        std::string word = context.words[i];
+    for(int i = 0; i < numberOfWords; ++i) {
+        std::string word = words[i];
         bool inQuotes = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10);
         bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !useCaplitalNext;
         bool itsNumber = context.testSettings.useNumbers && (GetRandomValue(0, 10) == 10);
@@ -107,7 +108,6 @@ std::string generateSentence(Context &context, int words) {
     output.pop_back();
 
     return output;
-
 }
 
 void restartTest(Context &context, bool repeat) {

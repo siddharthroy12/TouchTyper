@@ -17,12 +17,18 @@ struct Fonts {
 };
 
 struct Theme {
+    std::string name;
     Color background;
     Color cursor;
     Color text;
     Color wrong;
     Color correct;
     Color highlight;
+};
+
+struct WordList {
+    std::string name;
+    std::vector<std::string> words;
 };
 
 enum class TestMode { TIME, WORDS };
@@ -42,7 +48,8 @@ struct Context {
     int screenWidth;
     int screenHeight;
     Screen currentScreen;
-    std::vector<std::string> words;
+    std::vector<WordList> wordsLists;
+    int selectedWordList = 0;
     std::string sentence;
     std::string input;
     double testStartTime = 0;
@@ -56,9 +63,12 @@ struct Context {
     int furthestVisitedIndex = -1;
     int accuracy = 0;
     Fonts fonts;
-    Theme theme;
+    std::vector<Theme> themes;
+    int selectedTheme = 2;
     TestSettings testSettings;
     bool mouseOnClickable = false;
+    void load();
+    void unload();
 };
 
 #endif

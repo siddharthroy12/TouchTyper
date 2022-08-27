@@ -14,13 +14,16 @@ std::vector<std::vector<char>> keyboard = {
     {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
     {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';','\''},
     {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'},
-    // Space here
+    {' '}
 };
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.typingTestFont.font, "a",
                                             context.fonts.typingTestFont.size, 1);
+
+    Theme theme = context.themes[context.selectedTheme];
+
     // To make it responsive
     int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
     int height = sizeOfCharacter.y * 3;
@@ -52,7 +55,7 @@ void typingTest(Context &context) {
 
     drawMonospaceText(context.fonts.typingTestFont.font,
                TextFormat("Time: %ds WPM:%d", time, context.wpm),
-               liveScoreTextPos, context.fonts.typingTestFont.size, context.theme.text);
+               liveScoreTextPos, context.fonts.typingTestFont.size, theme.text);
     */
 
     // Begin Drawing sentence
@@ -90,7 +93,7 @@ void typingTest(Context &context) {
 
             // Draw each character
             for (auto character : word) {
-                Color color = context.theme.text;
+                Color color = theme.text;
                 std::string c(1, character);
 
                 // Draw cursor
@@ -99,15 +102,15 @@ void typingTest(Context &context) {
                     yOffset = line > 2 ? ((line-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
                     DrawRectangle(cursorPostion.x+1, currentPositon.y,
                                   sizeOfCharacter.x, sizeOfCharacter.y,
-                                  context.theme.cursor);
+                                  theme.cursor);
                 }
 
                 // Check if the input is correct or wrong
                 if (index+1 < context.input.size()) {
                     if (context.sentence[index+1] == context.input[index+1]) {
-                        color = context.theme.correct;
+                        color = theme.correct;
                     } else {
-                        color = context.theme.wrong;
+                        color = theme.wrong;
                         if (context.sentence[index+1] != ' ') {
                             wordMistake = true;
                         }
@@ -115,7 +118,7 @@ void typingTest(Context &context) {
                         if (c == std::string(" ")) {
                             DrawRectangle(currentPositon.x, currentPositon.y,
                                           sizeOfCharacter.x, sizeOfCharacter.y,
-                                          context.theme.wrong);
+                                          theme.wrong);
                         }
                     }
                 }
@@ -134,7 +137,7 @@ void typingTest(Context &context) {
             underlineEnd.x -= sizeOfCharacter.x;
 
             if (wordMistake) {
-                DrawLineEx(underlineStart, underlineEnd, 2, context.theme.wrong);
+                DrawLineEx(underlineStart, underlineEnd, 2, theme.wrong);
             }
 
             word = "";
@@ -154,7 +157,7 @@ void typingTest(Context &context) {
 
     for (int i = 0; i < keyboard.size(); i++) {
         auto row = keyboard[i];
-        int totalWidth = (sizeOfKey * keyboard[i].size()) + margin * (keyboard[i].size()-1);
+        int totalWidth = row[0] == ' ' ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
         Vector2 position;
         position.x = center.x - (totalWidth/2.0);
         position.y = (startingPosition.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
@@ -164,19 +167,18 @@ void typingTest(Context &context) {
             Rectangle rect;
             rect.x = position.x;
             rect.y = position.y;
-            rect.width = sizeOfKey;
+            rect.width = row[0] == ' ' ? 200 : sizeOfKey;
             rect.height = sizeOfKey;
-            DrawRectangleRoundedLines(rect, 0.1, 5, 1, context.theme.text);
+            DrawRectangleRoundedLines(rect, 0.1, 5, 1, theme.text);
             if (IsKeyDown(toupper(key))) {
-                DrawRectangleRounded(rect, 0.1, 5, context.theme.correct);
+                DrawRectangleRounded(rect, 0.1, 5, theme.cursor);
             }
             Vector2 keyPosition;
             keyPosition.x = (rect.x + (sizeOfKey/2.0)) - (sizeOfCharacter.x/2.0);
             keyPosition.y = (rect.y + (sizeOfKey/2.0)) - (sizeOfCharacter.y/2.0);
-            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, context.theme.text);
+            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, theme.text);
 
             position.x += sizeOfKey + margin;
         }
     }
-
 }

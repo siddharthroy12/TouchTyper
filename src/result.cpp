@@ -7,6 +7,8 @@ void result(Context &context) {
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.bigFont.font, "a",
                                             context.fonts.bigFont.size, 1);
 
+    Theme theme = context.themes[context.selectedTheme];
+
     // To make it responsive
     int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
 
@@ -33,11 +35,11 @@ void result(Context &context) {
     position.y = center.y - (sizeOfCharacter.y/2.0);
 
     for (auto score : scores) {
-        Color color = context.theme.correct;
+        Color color = theme.correct;
         drawMonospaceText(context.fonts.bigFont.font, score[1], position, context.fonts.bigFont.size, color);
         Vector2 nPosition = position;
         nPosition.y -= context.fonts.typingTestFont.size/2.0;
-        color = context.theme.text;
+        color = theme.text;
         drawMonospaceText(context.fonts.typingTestFont.font, score[0], nPosition, context.fonts.typingTestFont.size, color);
         position.x += (score[1].size() * sizeOfCharacter.x) + sizeOfCharacter.x;
     }

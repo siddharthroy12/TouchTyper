@@ -11,12 +11,14 @@ float targetBarHeight = 0;
 float barHeight = 0;
 
 void options(Context &context, std::vector<std::string> &options, Vector2 &startingPosition, Vector2 &sizeOfCharacter, bool isAmounts) {
+    Theme theme = context.themes[context.selectedTheme];
+
     for (int i = 0; i < options.size(); i++) {
         auto word = options[i];
 
         Vector2 optionPosition = startingPosition;
         optionPosition.x -= word.size() * sizeOfCharacter.x;
-        Color color = context.theme.text;
+        Color color = theme.text;
         Rectangle optionRect;
         optionRect.x = optionPosition.x;
         optionRect.y = optionPosition.y;
@@ -24,7 +26,7 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
         optionRect.height = sizeOfCharacter.y;
 
         if (CheckCollisionPointRec(GetMousePosition(), optionRect)) {
-            color = context.theme.highlight;
+            color = theme.highlight;
             context.mouseOnClickable = true;
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -53,7 +55,7 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
             (word == secondOptions[1] && context.testSettings.testMode == TestMode::TIME) ||
             (word == secondOptions[0] && context.testSettings.testMode == TestMode::WORDS) ||
             (isAmounts && i == context.testSettings.selectedAmount)) {
-            color = context.theme.correct;
+            color = theme.correct;
         }
 
         drawMonospaceText(context.fonts.tinyFont.font, word, optionPosition, context.fonts.tinyFont.size, color);
@@ -66,6 +68,8 @@ void options(Context &context, std::vector<std::string> &options, Vector2 &start
 
 void header(Context &context) {
     int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
+
+    Theme theme = context.themes[context.selectedTheme];
 
     // Center of the screen
     Vector2 center = getCenter(context.screenWidth, context.screenHeight);
@@ -82,7 +86,7 @@ void header(Context &context) {
     Color color;
     std::string text;
     if (!context.testRunning) {
-        color = context.theme.correct;
+        color = theme.correct;
         switch (context.currentScreen) {
             case Screen::TEST:
                 text = "Start Typing";
@@ -92,7 +96,7 @@ void header(Context &context) {
                 break;
         }
     } else {
-        color = context.theme.text;
+        color = theme.text;
         if (context.testSettings.testMode == TestMode::WORDS) {
             text = TextFormat("%d/%d", context.input.size(), context.sentence.size());
         } else {
@@ -148,6 +152,6 @@ void header(Context &context) {
             break;
     }
 
-    DrawRectangle(0, 0, context.screenWidth * percentage, barHeight, context.theme.correct);
+    DrawRectangle(0, 0, context.screenWidth * percentage, barHeight, theme.correct);
 
 }

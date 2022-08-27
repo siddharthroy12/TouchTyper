@@ -63,34 +63,11 @@ int main(void) {
 #if defined(PLATFORM_WEB)
     InitWindow(browserWindowWidth(), browserWindowHeight(), PROJECT_NAME);
 #else
-    InitWindow(800, 450, PROJECT_NAME);
+    InitWindow(800, 500, PROJECT_NAME);
 #endif
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
-    //SetTargetFPS(60);
 
-    context.theme.background = {12, 13, 17, 255};
-    context.theme.text = {69, 72, 100, 255};
-    context.theme.cursor = {153, 214, 234, 255};
-    context.theme.wrong = RED;
-    context.theme.correct = {126, 186, 181, 255};
-    context.theme.highlight = RAYWHITE;
-    context.sentence = "end for also world better right now if you can me do that what now for etc hello then";
-    context.fonts.typingTestFont.size = 32;
-    context.fonts.typingTestFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
-            context.fonts.typingTestFont.size, nullptr, 0);
-    context.fonts.titleFont.size = 40;
-    context.fonts.titleFont.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf",
-            context.fonts.titleFont.size, nullptr, 0);
-    context.fonts.tinyFont.size = 18;
-    context.fonts.tinyFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
-            context.fonts.tinyFont.size, nullptr, 0);
-    context.fonts.bigFont.size = 90;
-    context.fonts.bigFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
-            context.fonts.bigFont.size, nullptr, 0);
-
-    if (!getFileContent("assets/word_lists/english_1k.txt", context.words)) {
-        return 1;
-    }
+    context.load();
 
     restartTest(context, false);
 
@@ -102,7 +79,7 @@ int main(void) {
         loop();
     }
 #endif
-
+    context.unload();
     CloseWindow();
 
     return 0;
@@ -111,6 +88,8 @@ int main(void) {
 void loop() {
     context.screenHeight = getWindowHeight();
     context.screenWidth = getWindowWidth();
+
+    Theme theme = context.themes[context.selectedTheme];
 
 #if defined(PLATFORM_WEB)
     static int old_w=0,old_h=0;
@@ -160,8 +139,10 @@ void loop() {
     }
 
     BeginDrawing();
-    ClearBackground(context.theme.background);
+    ClearBackground(theme.background);
+
     header(context);
+
 
     if (context.currentScreen == Screen::TEST) {
         if (IsKeyPressed(KEY_BACKSPACE)) {
@@ -228,5 +209,7 @@ void loop() {
     } else if (context.currentScreen == Screen::RESULT) {
         result(context);
     }
-        footer(context);
-    }
+
+    footer(context);
+    EndDrawing();
+}
