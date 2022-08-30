@@ -1,5 +1,6 @@
 #include "Context.hpp"
 #include "helpers.hpp"
+#include "../libs/raylib/src/raylib.h"
 
 void Context::load() {
     Theme arch;
@@ -33,43 +34,36 @@ void Context::load() {
 
     this->themes.push_back(white);
 
+    std::string base = GetApplicationDirectory();
+
     this->fonts.typingTestFont.size = 32;
-    this->fonts.typingTestFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
+    this->fonts.typingTestFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
             this->fonts.typingTestFont.size, nullptr, 0);
     this->fonts.titleFont.size = 40;
-    this->fonts.titleFont.font = LoadFontEx("assets/fonts/LexendDeca-Regular.ttf",
+    this->fonts.titleFont.font = LoadFontEx((base+"assets/fonts/LexendDeca-Regular.ttf").c_str(),
             this->fonts.titleFont.size, nullptr, 0);
     this->fonts.tinyFont.size = 18;
-    this->fonts.tinyFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
+    this->fonts.tinyFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
             this->fonts.tinyFont.size, nullptr, 0);
     this->fonts.bigFont.size = 90;
-    this->fonts.bigFont.font = LoadFontEx("assets/fonts/JetBrainsMono-Regular.ttf",
+    this->fonts.bigFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
             this->fonts.bigFont.size, nullptr, 0);
 
-    WordList english200;
-    english200.name = "English 200";
-    getFileContent("assets/word_lists/english_200.txt", english200.words);
-    this->wordsLists.push_back(english200);
+    int numberOfFiles;
+    char **files = GetDirectoryFiles((base+"assets/word_lists/").c_str(), &numberOfFiles);
 
-    WordList english1k;
-    english1k.name = "English 1k";
-    getFileContent("assets/word_lists/english_1k.txt", english1k.words);
-    this->wordsLists.push_back(english1k);
-
-    WordList english5k;
-    english5k.name = "English 5k";
-    getFileContent("assets/word_lists/english_5k.txt", english5k.words);
-    this->wordsLists.push_back(english5k);
-
-    WordList english10k;
-    english10k.name = "English 10k";
-    getFileContent("assets/word_lists/english_10k.txt", english10k.words);
-    this->wordsLists.push_back(english10k);
-
-    WordList english25k;
-    english25k.name = "English 25k";
-    getFileContent("assets/word_lists/english_25k.txt", english25k.words);
-    this->wordsLists.push_back(english25k);
+    for (int i = numberOfFiles-1; i > -1; i--) {
+        if (files[i][0] != '.') {
+            WordList wordList;
+            std::string name = files[i];
+            name.replace(name.find(".txt"), sizeof(".txt") - 1, "");
+            name.replace(name.find("_"), sizeof("_") - 1, " ");
+            name[0] = toupper(name[0]);
+            wordList.name = name;
+            getFileContent((base+"assets/word_lists/"+files[i]).c_str(), wordList.words);
+            this->wordsLists.push_back(wordList);
+        }
+    }
 }
 
 void Context::unload() {

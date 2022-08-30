@@ -89,10 +89,10 @@ void header(Context &context) {
         color = theme.correct;
         switch (context.currentScreen) {
             case Screen::TEST:
-                text = "Start Typing";
+                text = "start typing";
                 break;
             case Screen::RESULT:
-                text = "Result";
+                text = "result";
                 break;
         }
     } else {
@@ -102,8 +102,6 @@ void header(Context &context) {
         } else {
             text = TextFormat("%ds", (int)(GetTime() - context.testStartTime));
         }
-
-        text += " " + std::to_string(context.wpm);
     }
 
     DrawTextEx(context.fonts.titleFont.font,

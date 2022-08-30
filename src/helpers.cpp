@@ -1,5 +1,6 @@
 #include "helpers.hpp"
 #include <cctype>
+#include <unordered_map>
 
 Vector2 getCenter(int width, int height) {
     Vector2 result;
@@ -41,6 +42,25 @@ char quotes[3][2] = {
     {'(', ')'}
 };
 
+std::unordered_map<std::string, std::string> punctuations = {
+  {"are", "aren't"},
+  {"can", "can't"},
+  {"could", "couldn't"},
+  {"did", "didn't"},
+  {"does", "doesn't"},
+  {"do", "don't"},
+  {"had", "hadn't"},
+  {"has", "hasn't"},
+  {"have", "haven't"},
+  {"is", "isn't"},
+  {"must", "mustn't"},
+  {"should", "shouldn't"},
+  {"was", "wasn't"},
+  {"were", "weren't"},
+  {"will", "won't"},
+  {"would", "wouldn't"}
+};
+
 std::string generateSentence(Context &context, int numberOfWords) {
     auto words = context.wordsLists[context.selectedWordList].words;
     std::string output = "";
@@ -51,6 +71,13 @@ std::string generateSentence(Context &context, int numberOfWords) {
     // Put the words in the senctence
     for(int i = 0; i < numberOfWords; ++i) {
         std::string word = words[i];
+
+        if (context.testSettings.usePunctuation) {
+            if (punctuations.find(word) != punctuations.end()) {
+                word = punctuations[word];
+            }
+        }
+
         bool inQuotes = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10);
         bool itsDashTime = context.testSettings.usePunctuation && (GetRandomValue(0, 10) == 10) && !previousWasDash && !useCaplitalNext;
         bool itsNumber = context.testSettings.useNumbers && (GetRandomValue(0, 10) == 10);
@@ -77,10 +104,10 @@ std::string generateSentence(Context &context, int numberOfWords) {
 
         // Put . or , randomly
         if (GetRandomValue(0, 10) > 8 &&
-            context.testSettings.usePunctuation &&
-            !previousWasDash &&
-            !itsDashTime &&
-            !inQuotes) {
+                context.testSettings.usePunctuation &&
+                !previousWasDash &&
+                !itsDashTime &&
+                !inQuotes) {
             switch (GetRandomValue(0, 3)) {
                 case 0:
                     output.push_back(',');
