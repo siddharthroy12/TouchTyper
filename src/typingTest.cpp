@@ -45,25 +45,13 @@ void typingTest(Context &context) {
 
     std::string word;
 
-    // Draw live Score
-    /*
-    Vector2 liveScoreTextPos;
-    liveScoreTextPos.y = startingPosition.y - sizeOfCharacter.y + yOffset;
-    liveScoreTextPos.x = startingPosition.x;
-
-    int time = context.testRunning ? ((GetTime() - context.testStartTime)) : 0;
-
-    drawMonospaceText(context.fonts.typingTestFont.font,
-               TextFormat("Time: %ds WPM:%d", time, context.wpm),
-               liveScoreTextPos, context.fonts.typingTestFont.size, theme.text);
-    */
-
     // Begin Drawing sentence
     BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height > 1 ? height : 1);
 
     // Animate cursor
-    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, cursorSpeed * GetFrameTime());
-    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, cursorSpeed * GetFrameTime());
+    float speed = cursorSpeed * GetFrameTime();
+    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, (speed <= 0 || speed > 1) ? 1 : speed);
+    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, (speed <= 0 || speed > 1) ? 1 : speed);
 
     // To keep track of current line
     int line = 1;

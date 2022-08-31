@@ -31,7 +31,7 @@ struct WordList {
     std::vector<std::string> words;
 };
 
-enum class TestMode { TIME, WORDS };
+enum class TestMode { TIME = 0, WORDS };
 enum class Screen { TEST, RESULT };
 
 struct TestSettings {
@@ -40,8 +40,6 @@ struct TestSettings {
     TestMode testMode = TestMode::TIME;
     std::vector<int> testModeAmounts = {120, 60, 30, 15};
     int selectedAmount = 1;
-    int time = 60;
-    int words = 100;
 };
 
 struct Context {

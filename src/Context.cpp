@@ -64,11 +64,25 @@ void Context::load() {
             this->wordsLists.push_back(wordList);
         }
     }
+
+    this->selectedTheme = loadStorageValue(0, 0);
+    this->selectedWordList = loadStorageValue(1, 0);
+    this->testSettings.selectedAmount = loadStorageValue(2, 1);
+    this->testSettings.usePunctuation = loadStorageValue(3, 0);
+    this->testSettings.useNumbers = loadStorageValue(4, 0);
+    this->testSettings.testMode = (TestMode)loadStorageValue(5, 0);
 }
 
 void Context::unload() {
     UnloadFont(this->fonts.typingTestFont.font);
     UnloadFont(this->fonts.tinyFont.font);
     UnloadFont(this->fonts.bigFont.font);
+
+    saveStorageValue(0, this->selectedTheme);
+    saveStorageValue(1, this->selectedWordList);
+    saveStorageValue(2, this->testSettings.selectedAmount);
+    saveStorageValue(3, this->testSettings.usePunctuation);
+    saveStorageValue(4, this->testSettings.useNumbers);
+    saveStorageValue(5, (int)this->testSettings.testMode);
 }
 

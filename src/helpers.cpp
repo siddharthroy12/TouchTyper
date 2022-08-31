@@ -196,3 +196,86 @@ bool getFileContent(std::string fileName, std::vector<std::string> & vecOfStrs) 
     in.close();
     return true;
 }
+
+// Save integer value to storage file (to defined position)
+// NOTE: Storage positions is directly related to file memory layout (4 bytes each integer)
+bool saveStorageValue(unsigned int position, int value) {
+    bool success = false;
+    unsigned int dataSize = 0;
+    unsigned int newDataSize = 0;
+    const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
+    unsigned char *fileData = LoadFileData(filePath, &dataSize);
+    unsigned char *newFileData = NULL;
+
+    if (fileData != NULL) {
+        if (dataSize <= (position*sizeof(int))) {
+            // Increase data size up to position and store value
+            newDataSize = (position + 1)*sizeof(int);
+            newFileData = (unsigned char *)RL_REALLOC(fileData, newDataSize);
+
+            if (newFileData != NULL) {
+                // RL_REALLOC succeded
+                int *dataPtr = (int *)newFileData;
+                dataPtr[position] = value;
+            } else {
+                // RL_REALLOC failed
+                TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to realloc data (%u), position in bytes (%u) bigger than actual file size", filePath, dataSize, position*sizeof(int));
+
+                // We store the old size of the file
+                newFileData = fileData;
+                newDataSize = dataSize;
+            }
+        } else {
+            // Store the old size of the file
+            newFileData = fileData;
+            newDataSize = dataSize;
+
+            // Replace value on selected position
+            int *dataPtr = (int *)newFileData;
+            dataPtr[position] = value;
+        }
+
+        success = SaveFileData(filePath, newFileData, newDataSize);
+        RL_FREE(newFileData);
+
+        TraceLog(LOG_INFO, "FILEIO: [%s] Saved storage value: %i", filePath, value);
+    } else {
+        TraceLog(LOG_INFO, "FILEIO: [%s] File created successfully", filePath);
+
+        dataSize = (position + 1)*sizeof(int);
+        fileData = (unsigned char *)RL_MALLOC(dataSize);
+        int *dataPtr = (int *)fileData;
+        dataPtr[position] = value;
+
+        success = SaveFileData(filePath, fileData, dataSize);
+        UnloadFileData(fileData);
+
+        TraceLog(LOG_INFO, "FILEIO: [%s] Saved storage value: %i", filePath, value);
+    }
+
+    return success;
+}
+
+// Load integer value from storage file (from defined position)
+// NOTE: If requested position could not be found, value 0 is returned
+int loadStorageValue(unsigned int position, int defaultValue) {
+    int value = defaultValue;
+    unsigned int dataSize = 0;
+    const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);
+    unsigned char *fileData = LoadFileData(filePath, &dataSize);
+
+    if (fileData != NULL) {
+        if (dataSize < (position*4)) {
+            TraceLog(LOG_WARNING, "FILEIO: [%s] Failed to find storage position: %i", filePath, position);
+        } else {
+            int *dataPtr = (int *)fileData;
+            value = dataPtr[position];
+        }
+
+        UnloadFileData(fileData);
+
+        TraceLog(LOG_INFO, "FILEIO: [%s] Loaded storage value: %i", filePath, value);
+    }
+
+    return value;
+}

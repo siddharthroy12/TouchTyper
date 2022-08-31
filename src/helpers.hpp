@@ -6,6 +6,19 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
+
+#define STORAGE_DATA_FILE "storage.data"
+
+typedef enum {
+    STORAGE_POSITION_SCORE      = 0,
+    STORAGE_POSITION_HISCORE    = 1
+} StorageData;
+
+// Persistent storage functions
+bool saveStorageValue(unsigned int position, int value);
+int loadStorageValue(unsigned int position, int defaultValue);
+
 
 Vector2 getCenter(int width, int height);
 
