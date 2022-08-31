@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Context.hpp"
 #include "helpers.hpp"
 #include "../libs/raylib/src/raylib.h"
@@ -66,7 +67,18 @@ void Context::load() {
     }
 
     this->selectedTheme = loadStorageValue(0, 0);
-    this->selectedWordList = loadStorageValue(1, 0);
+    this->selectedWordList = loadStorageValue(1, -1);
+    if (this->selectedWordList == -1) {
+        int index;
+
+        for (int i = 0; i < this->wordsLists.size(); i++) {
+            if (this->wordsLists[i].name == "English 200") {
+                index = i;
+                break;
+            }
+        }
+        this->selectedWordList = index;
+    }
     this->testSettings.selectedAmount = loadStorageValue(2, 1);
     this->testSettings.usePunctuation = loadStorageValue(3, 0);
     this->testSettings.useNumbers = loadStorageValue(4, 0);
