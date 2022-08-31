@@ -27,6 +27,11 @@ add_custom_target(copy_assets
 
 #add_compile_options(-Wall -Wextra -pedantic)
 file(GLOB_RECURSE APP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
+
 add_executable(${CMAKE_PROJECT_NAME} WIN32 ${APP_SOURCES})
 
 add_dependencies(${CMAKE_PROJECT_NAME} copy_assets)

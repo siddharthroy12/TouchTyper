@@ -59,12 +59,6 @@ Context context;
 
 void loop();
 
-#ifdef _WIN32
-int WinMain() {
-    return main();
-}
-#endif
-
 int main(void) {
 #if defined(PLATFORM_WEB)
     InitWindow(browserWindowWidth(), browserWindowHeight(), PROJECT_NAME);
