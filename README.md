@@ -4,7 +4,7 @@
 ![](https://github.com/siddharthroy12/TouchTyper/actions/workflows/webbuild.yml/badge.svg)
 # About
 
-I practise typing a lot and I've been using monkey type for long time but that website does not work smoothly on my low-end laptop and I can't use it when I don't have internet so I made my own typing test program using C++.
+I practice typing a lot and I've been using monkey type for long time but that website does not work smoothly on my low-end laptop and I can't use it when I don't have internet so I made my own typing test program using C++.
 
 You can download it from the [releases](https://github.com/siddharthroy12/TouchTyper/releases) page or just visit the [website](https://siddharthroy12.github.io/TouchTyper/) to run it on your browser.
 
