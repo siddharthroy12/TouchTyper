@@ -6,12 +6,12 @@
 void Context::load() {
     Theme arch;
     arch.name = "Arch";
-    arch.background = {12, 13, 17, 255};
+    arch.background = {6, 7, 9, 255};
     arch.text = {92, 96, 133, 255};
-    arch.cursor = {153, 214, 234, 255};
+    arch.cursor = {214, 227, 255, 255};
     arch.wrong = RED;
-    arch.correct = {126, 186, 181, 255};
-    arch.highlight = RAYWHITE;
+    arch.correct = arch.cursor;
+    arch.highlight = arch.correct;
     this->themes.push_back(arch);
 
     Theme black;
@@ -28,12 +28,41 @@ void Context::load() {
     white.name = "White";
     white.background = {197, 200, 171, 255};
     white.text = {69, 68, 56, 255};
-    white.cursor = {172, 175, 148, 255};
+    white.cursor = white.text;
     white.wrong = {209, 97, 67, 255};
     white.correct = black.background;
     white.highlight = black.background;
-
     this->themes.push_back(white);
+
+    Theme espresso;
+    espresso.name = "Espresso";
+    espresso.background = {23, 18, 18, 255};
+    espresso.text = {202, 176, 155, 255};
+    espresso.cursor = {255, 185, 56, 255};
+    espresso.wrong = {250, 31, 15, 255};
+    espresso.correct = espresso.cursor;
+    espresso.highlight = espresso.cursor;
+    this->themes.push_back(espresso);
+
+    Theme catppuccin;
+    catppuccin.name = "Catppuccin";
+    catppuccin.background = {27, 25, 35, 255};
+    catppuccin.text = {198, 160, 246, 255};
+    catppuccin.cursor = {166, 218, 149, 255};
+    catppuccin.wrong = {227, 140, 143, 255};
+    catppuccin.correct = {145, 215, 227, 255};
+    catppuccin.highlight = catppuccin.cursor;
+    this->themes.push_back(catppuccin);
+
+    Theme cyberpunk;
+    cyberpunk.name = "Cyberpunk";
+    cyberpunk.background = {13, 13, 13, 255};
+    cyberpunk.text = {84, 84, 84, 255};
+    cyberpunk.cursor = {208, 237, 87, 255};
+    cyberpunk.wrong = {248, 82, 74, 255};
+    cyberpunk.correct = {26, 214, 118, 255};
+    cyberpunk.highlight = WHITE;
+    this->themes.push_back(cyberpunk);
 
     std::string base = GetApplicationDirectory();
 

@@ -25,7 +25,6 @@ int optionSelect(Context &context, std::vector<std::string> &options, int select
 
     DrawRectangle(0, 0, context.screenWidth, context.screenHeight, {0, 0, 0, 100});
     DrawRectangleRec(rect, theme.background);
-    DrawRectangleLinesEx(rect, 1, theme.text);
     Vector2 startingPosition;
     startingPosition.x = rect.x + optionsContainerPadding;
     startingPosition.y = rect.y + optionsContainerPadding;
@@ -49,7 +48,7 @@ int optionSelect(Context &context, std::vector<std::string> &options, int select
         }
 
         if (i == selected || mouseOnOption) {
-            DrawRectangleRec(optionRect, theme.text);
+            DrawRectangleRec(optionRect, theme.cursor);
             color = theme.background;
         }
 
@@ -57,6 +56,9 @@ int optionSelect(Context &context, std::vector<std::string> &options, int select
         drawMonospaceText(context.fonts.tinyFont.font, option, startingPosition, context.fonts.tinyFont.size, color);
         startingPosition.y += sizeOfCharacter.y + optionPadding;
     }
+
+    DrawRectangleLinesEx(rect, 1, theme.correct);
+
 
     return -1;
 }

@@ -8,7 +8,8 @@
 Vector2 cursorPostion = {0, 0};
 Vector2 newCursorPosition = {0, 0};
 float cursorSpeed = 20;
-int yOffset = 0;
+float yOffset = 0;
+float newYOffset = 0;
 
 std::vector<std::vector<char>> keyboard = {
     {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
@@ -20,118 +21,119 @@ std::vector<std::vector<char>> keyboard = {
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
     Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.typingTestFont.font, "a",
-                                            context.fonts.typingTestFont.size, 1);
+            context.fonts.typingTestFont.size, 1);
 
     Theme theme = context.themes[context.selectedTheme];
 
     // To make it responsive
-    int width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
-    int height = sizeOfCharacter.y * 3;
+    float width = std::min(context.screenWidth-(PADDING*2), MAX_WIDTH);
+    float height = sizeOfCharacter.y * 3;
 
     // Center of the screen
     Vector2 center = getCenter(context.screenWidth, context.screenHeight);
 
-    // Where the first character will be placed
-    Vector2 startingPosition;
-    startingPosition.x = center.x - width/2.0;
-    startingPosition.y = (center.y - height/2.0) - 100;
-    if (startingPosition.y < 95) {
-        startingPosition.y = 95;
-    }
-    startingPosition.y -= yOffset;
-
-    // Positions of character of the sentence on the screen
-    Vector2 currentPositon = startingPosition;
-
-    std::string word;
-
-    // Begin Drawing sentence
-    BeginScissorMode(startingPosition.x, startingPosition.y + yOffset+1, width, height > 1 ? height : 1);
-
-    // Animate cursor
+    // Animate scroll
     float speed = cursorSpeed * GetFrameTime();
-    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, (speed <= 0 || speed > 1) ? 1 : speed);
-    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, (speed <= 0 || speed > 1) ? 1 : speed);
+    yOffset = Lerp(yOffset, newYOffset, (speed <= 0 || speed > 1) ? 1 : speed);
 
-    // To keep track of current line
-    int line = 1;
+    // Calculate how many words will be in each line according to the available screen size
+    std::vector<std::string> lines;
+    std::string currentLine = "";
+    std::string currentWord = "";
 
     for (int i = 0; i < context.sentence.size(); i++) {
-        // Detect the end of the word
+        // Detect the end of a word
         if (context.sentence[i] == ' ' || i == (context.sentence.size() - 1)) {
-            // Add that ending space character too
-            word += context.sentence[i];
+            currentWord += context.sentence[i];
 
             // Calculate the width of the word
-            int widthOfWord = word.size() * sizeOfCharacter.x;
+            float widthOfWord = currentWord.size() * sizeOfCharacter.x;
+
+            float widthOfNewLine = widthOfWord + currentLine.size() * sizeOfCharacter.x;
 
             // Go to new line if word is overflowing
-            if (currentPositon.x + widthOfWord > center.x + width/2.0) {
-                currentPositon.y += sizeOfCharacter.y;
-                currentPositon.x = startingPosition.x;
-                line++;
+            if (widthOfNewLine > width-(PADDING*2)) {
+                lines.push_back(currentLine);
+                currentLine = "";
             }
 
-            // Index of the character where the cursor should be
-            int index = i - word.size();
+            currentLine += currentWord;
+            currentWord = "";
+        } else {
+            currentWord.push_back(context.sentence[i]);
+        }
+    }
 
-            Vector2 underlineStart = currentPositon;
-            underlineStart.y += sizeOfCharacter.y;
-            bool wordMistake = false;
+    lines.push_back(currentLine);
 
-            // Draw each character
-            for (auto character : word) {
-                Color color = theme.text;
-                std::string c(1, character);
+    Rectangle textBox = {
+        (float)(center.x - width/2.0),
+        (float)((center.y - height/2.0) - 100),
+        (float)width,
+        (float)(height > 1 ? height : 1), // To fix a bug in Secissor Mode when it crashes when the height is < 1
+    };
 
-                // Draw cursor
-                if (index == context.input.size()-1) {
-                    newCursorPosition = currentPositon;
-                    yOffset = line > 2 ? ((line-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
-                    DrawRectangle(cursorPostion.x+1, currentPositon.y,
-                                  sizeOfCharacter.x, sizeOfCharacter.y,
-                                  theme.cursor);
-                }
+    if (textBox.y < 95) {
+        textBox.y = 95;
+    }
 
-                // Check if the input is correct or wrong
-                if (index+1 < context.input.size()) {
-                    if (context.sentence[index+1] == context.input[index+1]) {
-                        color = theme.correct;
-                    } else {
-                        color = theme.wrong;
-                        if (context.sentence[index+1] != ' ') {
-                            wordMistake = true;
-                        }
+    // Begin Drawing sentence
+    BeginScissorMode(textBox.x, textBox.y, textBox.width, textBox.height);
 
-                        if (c == std::string(" ")) {
-                            DrawRectangle(currentPositon.x, currentPositon.y,
-                                          sizeOfCharacter.x, sizeOfCharacter.y,
-                                          theme.wrong);
-                        }
+    float currentLineY = textBox.y - yOffset;
+    int characterIndex = 0;
+    int lineNumber = 1;
+
+    for (auto& line : lines) {
+        float widthOfLine = sizeOfCharacter.x * line.size();
+
+        float currentLetterX = center.x - (widthOfLine/2);
+
+        for (char& letter : line) {
+            Color color = theme.text;
+
+            if (context.input.size() > characterIndex) {
+                // Check if the character is wrong
+                if (letter == context.input[characterIndex]) {
+                    color = theme.correct;
+                } else {
+                    color = theme.wrong;
+
+                    // Draw underline if space
+                    if (letter == ' ') {
+                        DrawTextEx(context.fonts.typingTestFont.font, "_",
+                                {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
+                                1, color);
+
                     }
                 }
-
-                // Draw the text
-                DrawTextEx(context.fonts.typingTestFont.font, c.c_str(),
-                           currentPositon, context.fonts.typingTestFont.size,
-                           1, color);
-
-                currentPositon.x += sizeOfCharacter.x;
-                index++;
             }
 
-            Vector2 underlineEnd = currentPositon;
-            underlineEnd.y += sizeOfCharacter.y;
-            underlineEnd.x -= sizeOfCharacter.x;
+            // Handle cursor
+            if (characterIndex == context.input.size()) {
+                // Set the offset to make the cursor at center
+                newYOffset = lineNumber > 2 ? ((lineNumber-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
 
-            if (wordMistake) {
-                DrawLineEx(underlineStart, underlineEnd, 2, theme.wrong);
+                // Draw Cursor
+                DrawRectangle(currentLetterX+1, currentLineY,
+                        sizeOfCharacter.x, sizeOfCharacter.y,
+                        theme.cursor);
+
+                // Make the color of the text inverted
+                color = theme.background;
             }
 
-            word = "";
-        } else {
-            word += context.sentence[i];
+            // Draw Text
+            DrawTextEx(context.fonts.typingTestFont.font, std::string(1, letter).c_str(),
+                    {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
+                    1, color);
+
+            currentLetterX += sizeOfCharacter.x;
+            characterIndex++;
         }
+
+        currentLineY += sizeOfCharacter.y;
+        lineNumber++;
     }
 
     EndScissorMode();
@@ -140,15 +142,14 @@ void typingTest(Context &context) {
     const int sizeOfKey = 35;
     const int margin = 5;
     sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
-                                            context.fonts.tinyFont.size, 1);
-    startingPosition.y += yOffset;
+            context.fonts.tinyFont.size, 1);
 
     for (int i = 0; i < keyboard.size(); i++) {
         auto row = keyboard[i];
         int totalWidth = row[0] == ' ' ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
         Vector2 position;
         position.x = center.x - (totalWidth/2.0);
-        position.y = (startingPosition.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
+        position.y = (textBox.y + (sizeOfCharacter.y * 8)) + (sizeOfKey * i) + margin * i;
 
         for (auto key : row) {
             std::string c(1, key);
