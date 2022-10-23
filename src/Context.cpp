@@ -131,6 +131,7 @@ void Context::load() {
     this->testSettings.useNumbers = loadStorageValue(4, 0);
     this->testSettings.testMode = (TestMode)loadStorageValue(5, 0);
     this->cursorStyle = (CursorStyle)loadStorageValue(6, 0);
+    this->soundOn = loadStorageValue(7, 1);
 }
 
 void Context::unload() {
@@ -145,5 +146,6 @@ void Context::unload() {
     saveStorageValue(4, this->testSettings.useNumbers);
     saveStorageValue(5, (int)this->testSettings.testMode);
     saveStorageValue(6, (int)this->cursorStyle);
+    saveStorageValue(7, this->soundOn);
 }
 
