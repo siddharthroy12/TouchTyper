@@ -65,6 +65,16 @@ void Context::load() {
     cyberpunk.highlight = WHITE;
     this->themes.push_back(cyberpunk);
 
+    Theme material;
+    material.name = "Material";
+    material.background = {33, 33, 33, 255};
+    material.text = {95 , 99, 99, 255};
+    material.cursor = {199, 146, 234, 255};
+    material.wrong = {247, 140, 108, 255};
+    material.correct = {195, 232, 141, 255};
+    material.highlight = {127, 204, 196, 255};
+    this->themes.push_back(material);
+
     std::string base = GetApplicationDirectory();
 
     // Load fonts
