@@ -129,13 +129,6 @@ void footer(Context &context) {
         bottomRightPosition.y - sizeOfCharacter.y
     };
 
-    if (textButton(context, themePosition, "theme")) {
-        showThemesOptions = !showThemesOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        showThemesOptions = false;
-    }
-
-
     if (showThemesOptions)  {
         std::vector<std::string> themeOptions;
         for (auto theme : context.themes) {
@@ -148,19 +141,18 @@ void footer(Context &context) {
             context.selectedTheme = selected;
             showThemesOptions = false;
         }
+    }
 
+    if (textButton(context, themePosition, "theme")) {
+        showThemesOptions = !showThemesOptions;
+    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        showThemesOptions = false;
     }
 
     Vector2 worldlistPosition = {
         themePosition.x + sizeOfCharacter.x * 6,
         themePosition.y
     };
-
-    if (textButton(context, worldlistPosition, "word list")) {
-        showWordListOptions = !showWordListOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        showWordListOptions = false;
-    }
 
     if (showWordListOptions)  {
         std::vector<std::string> wordListOptions;
@@ -178,16 +170,16 @@ void footer(Context &context) {
         }
     }
 
+    if (textButton(context, worldlistPosition, "word list")) {
+        showWordListOptions = !showWordListOptions;
+    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        showWordListOptions = false;
+    }
+
     Vector2 cursorPosition = {
         bottomRightPosition.x - (sizeOfCharacter.x * (sizeof(VERSION) + 7)),
         bottomRightPosition.y - sizeOfCharacter.y
     };
-
-    if (textButton(context, cursorPosition, "cursor")) {
-        showCursorOptions = !showCursorOptions;
-    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        showCursorOptions = false;
-    }
 
     if (showCursorOptions) {
         std::vector<std::string> cursorOptions = {"Block", "Line", "Underline"};
@@ -198,9 +190,15 @@ void footer(Context &context) {
         }
     }
 
+    if (textButton(context, cursorPosition, "cursor")) {
+        showCursorOptions = !showCursorOptions;
+    } else if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        showCursorOptions = false;
+    }
+
     Vector2 soundPosition {
         cursorPosition.x - sizeOfCharacter.x * (context.soundOn ? 9 : 10),
-        cursorPosition.y
+            cursorPosition.y
     };
 
     if (textButton(context, soundPosition, context.soundOn ? "sound on" : "sound off")) {
