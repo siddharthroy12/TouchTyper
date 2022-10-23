@@ -37,7 +37,7 @@ add_executable(${CMAKE_PROJECT_NAME} WIN32 ${APP_SOURCES})
 add_dependencies(${CMAKE_PROJECT_NAME} copy_assets)
 
 # Set version number
-target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC VERSION="0.2.1")
+target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC VERSION="0.3.0")
 target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC PROJECT_NAME="${CMAKE_PROJECT_NAME}")
 
 if (EMSCRIPTEN)
