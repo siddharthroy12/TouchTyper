@@ -1,6 +1,7 @@
 #include "helpers.hpp"
 #include <cctype>
 #include <unordered_map>
+#include "Context.hpp"
 
 Vector2 getCenter(int width, int height) {
     Vector2 result;
@@ -18,6 +19,33 @@ void drawMonospaceText(Font font, std::string text, Vector2 position, float font
         DrawTextEx(font, c.c_str(), position, fontSize, 1, color);
         position.x += sizeOfCharacter.x;
     }
+}
+
+bool textButton(Context& context, Vector2 positon, std::string text) {
+    Vector2 sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
+            context.fonts.tinyFont.size, 1);
+    Theme theme = context.themes[context.selectedTheme];
+
+    Rectangle rect = {
+        positon.x,
+        positon.y,
+        sizeOfCharacter.x * text.size(),
+        sizeOfCharacter.y
+    };
+
+    Color color = theme.text;
+
+    if (CheckCollisionPointRec(GetMousePosition(), rect)) {
+        context.mouseOnClickable  = true;
+        color = theme.highlight;
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            return true;
+        }
+    }
+
+    drawMonospaceText(context.fonts.tinyFont.font, text, positon, context.fonts.tinyFont.size, color);
+
+    return false;
 }
 
 template<class BidiIter>
@@ -43,22 +71,22 @@ char quotes[3][2] = {
 };
 
 std::unordered_map<std::string, std::string> punctuations = {
-  {"are", "aren't"},
-  {"can", "can't"},
-  {"could", "couldn't"},
-  {"did", "didn't"},
-  {"does", "doesn't"},
-  {"do", "don't"},
-  {"had", "hadn't"},
-  {"has", "hasn't"},
-  {"have", "haven't"},
-  {"is", "isn't"},
-  {"must", "mustn't"},
-  {"should", "shouldn't"},
-  {"was", "wasn't"},
-  {"were", "weren't"},
-  {"will", "won't"},
-  {"would", "wouldn't"}
+    {"are", "aren't"},
+    {"can", "can't"},
+    {"could", "couldn't"},
+    {"did", "didn't"},
+    {"does", "doesn't"},
+    {"do", "don't"},
+    {"had", "hadn't"},
+    {"has", "hasn't"},
+    {"have", "haven't"},
+    {"is", "isn't"},
+    {"must", "mustn't"},
+    {"should", "shouldn't"},
+    {"was", "wasn't"},
+    {"were", "weren't"},
+    {"will", "won't"},
+    {"would", "wouldn't"}
 };
 
 std::string generateSentence(Context &context, int numberOfWords) {

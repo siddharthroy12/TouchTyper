@@ -104,10 +104,13 @@ void header(Context &context) {
         }
     }
 
-    DrawTextEx(context.fonts.titleFont.font,
-            text.c_str(), topLeftPosition,
-            context.fonts.titleFont.size, 1, color);
-
+    if (!context.testRunning) {
+        DrawTextEx(context.fonts.titleFont.font,
+                text.c_str(), topLeftPosition,
+                context.fonts.titleFont.size, 1, color);
+    } else {
+        drawMonospaceText(context.fonts.titleFont.font, text, topLeftPosition, context.fonts.titleFont.size, color);
+    }
 
     // Draw Options
     Vector2 startingPosition = topRightPosition;

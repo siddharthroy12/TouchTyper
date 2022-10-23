@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "Context.hpp"
 #include "helpers.hpp"
+#include <iostream>
 #include "../libs/raylib/src/raylib.h"
 
 void Context::load() {
@@ -18,7 +19,7 @@ void Context::load() {
     black.name = "Black";
     black.background = {17, 17, 17, 255};
     black.text = {96, 96, 96, 255};
-    black.cursor = {238, 238, 238, 255};
+    black.cursor = {225, 225, 225, 255};
     black.wrong = {218, 51, 51, 255};
     black.correct = black.cursor;
     black.highlight = black.cursor;
@@ -26,9 +27,9 @@ void Context::load() {
 
     Theme white;
     white.name = "White";
-    white.background = {197, 200, 171, 255};
-    white.text = {69, 68, 56, 255};
-    white.cursor = white.text;
+    white.background = {238, 235, 226, 255};
+    white.text = {153, 148, 127, 255};
+    white.cursor = WHITE;
     white.wrong = {209, 97, 67, 255};
     white.correct = black.background;
     white.highlight = black.background;
@@ -66,6 +67,7 @@ void Context::load() {
 
     std::string base = GetApplicationDirectory();
 
+    // Load fonts
     this->fonts.typingTestFont.size = 32;
     this->fonts.typingTestFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
             this->fonts.typingTestFont.size, nullptr, 0);
@@ -79,6 +81,8 @@ void Context::load() {
     this->fonts.bigFont.font = LoadFontEx((base+"assets/fonts/JetBrainsMono-Regular.ttf").c_str(),
             this->fonts.bigFont.size, nullptr, 0);
 
+
+    // Load word lists
     int numberOfFiles;
     char **files = GetDirectoryFiles((base+"assets/word_lists/").c_str(), &numberOfFiles);
 
@@ -108,10 +112,15 @@ void Context::load() {
         }
         this->selectedWordList = index;
     }
+
+    // Load sounds
+    this->sounds.clickSound1 = LoadSound((base+"assets/audio/otemu_browns.wav").c_str());
+
     this->testSettings.selectedAmount = loadStorageValue(2, 1);
     this->testSettings.usePunctuation = loadStorageValue(3, 0);
     this->testSettings.useNumbers = loadStorageValue(4, 0);
     this->testSettings.testMode = (TestMode)loadStorageValue(5, 0);
+    this->cursorStyle = (CursorStyle)loadStorageValue(6, 0);
 }
 
 void Context::unload() {
@@ -125,5 +134,6 @@ void Context::unload() {
     saveStorageValue(3, this->testSettings.usePunctuation);
     saveStorageValue(4, this->testSettings.useNumbers);
     saveStorageValue(5, (int)this->testSettings.testMode);
+    saveStorageValue(6, (int)this->cursorStyle);
 }
 

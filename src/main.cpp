@@ -60,12 +60,14 @@ Context context;
 void loop();
 
 int main(void) {
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
 #if defined(PLATFORM_WEB)
     InitWindow(browserWindowWidth(), browserWindowHeight(), PROJECT_NAME);
 #else
     InitWindow(800, 500, PROJECT_NAME);
 #endif
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
+    InitAudioDevice();
 
     context.load();
 
@@ -80,6 +82,7 @@ int main(void) {
     }
 #endif
     context.unload();
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;
@@ -146,8 +149,9 @@ void loop() {
 
     if (context.currentScreen == Screen::TEST) {
         if (IsKeyPressed(KEY_BACKSPACE)) {
-            if (context.input.size()) {
+            if (context.soundOn) PlaySoundMulti(context.sounds.clickSound1);
 
+            if (context.input.size()) {
                 // CTRL + Backspace
                 if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
                     while (context.input.size() && context.input[context.input.size()-1] == ' ' ) {
@@ -165,6 +169,10 @@ void loop() {
 
         if (key && (context.input.size() < context.sentence.size())) {
             context.input += key;
+
+            if (key != 0) {
+                if (context.soundOn) PlaySoundMulti(context.sounds.clickSound1);
+            }
 
             if (context.input.size() == 1 && !context.testRunning) {
                 context.testRunning = true;

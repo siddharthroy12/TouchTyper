@@ -24,6 +24,8 @@ Vector2 getCenter(int width, int height);
 
 void drawMonospaceText(Font font, std::string text, Vector2 position, float fontSize, Color color);
 
+bool textButton(Context& context, Vector2 positon, std::string text);
+
 double getTimeInMin();
 
 void restartTest(Context &context, bool repeat);

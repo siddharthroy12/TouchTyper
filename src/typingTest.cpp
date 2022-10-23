@@ -1,3 +1,4 @@
+#include "Context.hpp"
 #include "helpers.hpp"
 #include "typingTest.hpp"
 #include <vector>
@@ -10,6 +11,9 @@ Vector2 newCursorPosition = {0, 0};
 float cursorSpeed = 20;
 float yOffset = 0;
 float newYOffset = 0;
+float cursorOpacity = 1;
+int cursorOpacityDirection = 0;
+float cursorStayVisibleTimer = 0;
 
 std::vector<std::vector<char>> keyboard = {
     {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[',']'},
@@ -17,6 +21,11 @@ std::vector<std::vector<char>> keyboard = {
     {'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'},
     {' '}
 };
+
+float sinPulse(float frequency) {
+    const float pi = 3.14f;
+    return 0.5f * (1 + (float)std::sin(2 * pi * frequency * GetTime()));
+}
 
 void typingTest(Context &context) {
     // We are using a monospace font so every character will have same with
@@ -35,6 +44,20 @@ void typingTest(Context &context) {
     // Animate scroll
     float speed = cursorSpeed * GetFrameTime();
     yOffset = Lerp(yOffset, newYOffset, (speed <= 0 || speed > 1) ? 1 : speed);
+
+    // Animate cursor
+    cursorPostion.x = Lerp(cursorPostion.x, newCursorPosition.x, (speed <= 0 || speed > 1) ? 1 : speed);
+    cursorPostion.y = Lerp(cursorPostion.y, newCursorPosition.y, (speed <= 0 || speed > 1) ? 1 : speed);
+
+    // Cursor blink timer
+    if (cursorStayVisibleTimer > 0) {
+        cursorStayVisibleTimer -= GetFrameTime();
+    } else {
+        cursorStayVisibleTimer = 0;
+    }
+
+    // Animate cursor blink
+    cursorOpacity = sinPulse(1.5);
 
     // Calculate how many words will be in each line according to the available screen size
     std::vector<std::string> lines;
@@ -109,24 +132,47 @@ void typingTest(Context &context) {
                 }
             }
 
-            // Handle cursor
-            if (characterIndex == context.input.size()) {
-                // Set the offset to make the cursor at center
-                newYOffset = lineNumber > 2 ? ((lineNumber-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
-
-                // Draw Cursor
-                DrawRectangle(currentLetterX+1, currentLineY,
-                        sizeOfCharacter.x, sizeOfCharacter.y,
-                        theme.cursor);
-
-                // Make the color of the text inverted
-                color = theme.background;
-            }
-
             // Draw Text
             DrawTextEx(context.fonts.typingTestFont.font, std::string(1, letter).c_str(),
                     {currentLetterX, currentLineY}, context.fonts.typingTestFont.size,
                     1, color);
+
+            // Handle cursor
+            if (characterIndex == context.input.size()) {
+                // Set the offset to make the cursor at center
+                newYOffset = lineNumber > 2 ? ((lineNumber-1) * sizeOfCharacter.y) - sizeOfCharacter.y : 1;
+                newCursorPosition = { currentLetterX, currentLineY };
+
+                Color cursorColor = theme.cursor;
+                float blink = (cursorStayVisibleTimer != 0 )? 1 : cursorOpacity;
+
+                // Draw Cursor
+                if (blink > 0.5) {
+                    BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                    switch (context.cursorStyle) {
+                        case CursorStyle::BLOCK:
+                            DrawRectangle(cursorPostion.x+1, cursorPostion.y,
+                                    sizeOfCharacter.x, sizeOfCharacter.y,
+                                    cursorColor);
+                            // Make the color of the text inverted
+                            //color = theme.background;
+
+                            break;
+                        case CursorStyle::LINE:
+                            DrawRectangle(cursorPostion.x, cursorPostion.y,
+                                    2, sizeOfCharacter.y,
+                                    cursorColor);
+
+                            break;
+                        case CursorStyle::UNDERLINE:
+                            DrawRectangle(cursorPostion.x+1, cursorPostion.y+sizeOfCharacter.y,
+                                    sizeOfCharacter.x, 3,
+                                    cursorColor);
+                            break;
+                    }
+                    EndBlendMode();
+                }
+            }
 
             currentLetterX += sizeOfCharacter.x;
             characterIndex++;
@@ -144,6 +190,10 @@ void typingTest(Context &context) {
     sizeOfCharacter = MeasureTextEx(context.fonts.tinyFont.font, "a",
             context.fonts.tinyFont.size, 1);
 
+    if (IsKeyPressed(KEY_BACKSPACE)) {
+        cursorStayVisibleTimer = 1;
+    }
+
     for (int i = 0; i < keyboard.size(); i++) {
         auto row = keyboard[i];
         int totalWidth = row[0] == ' ' ? 200 : (sizeOfKey * row.size()) + margin * (row.size()-1);
@@ -159,14 +209,20 @@ void typingTest(Context &context) {
             rect.width = row[0] == ' ' ? 200 : sizeOfKey;
             rect.height = sizeOfKey;
             DrawRectangleRoundedLines(rect, 0.1, 5, 1, theme.text);
-            if (IsKeyDown(toupper(key))) {
-                DrawRectangleRounded(rect, 0.1, 5, theme.cursor);
-            }
+            Color color = theme.text;
             Vector2 keyPosition;
             keyPosition.x = (rect.x + (sizeOfKey/2.0)) - (sizeOfCharacter.x/2.0);
             keyPosition.y = (rect.y + (sizeOfKey/2.0)) - (sizeOfCharacter.y/2.0);
-            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, theme.text);
 
+            if (IsKeyDown(toupper(key))) {
+                BeginBlendMode(BLEND_SUBTRACT_COLORS);
+                DrawRectangleRounded(rect, 0.1, 5, theme.cursor);
+                EndBlendMode();
+                color = theme.background;
+                cursorStayVisibleTimer = 1;
+            }
+
+            drawMonospaceText(context.fonts.tinyFont.font, c.c_str(), keyPosition, context.fonts.tinyFont.size, color);
             position.x += sizeOfKey + margin;
         }
     }

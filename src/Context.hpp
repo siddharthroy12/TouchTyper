@@ -4,9 +4,17 @@
 #include <vector>
 #include "../libs/raylib/src/raylib.h"
 
+enum class CursorStyle { BLOCK = 0 , LINE = 1, UNDERLINE = 2 };
+
 struct FontData {
     Font font;
     int size;
+};
+
+struct Sounds {
+    Sound clickSound1;
+    Sound clickSound2;
+    Sound clickSound3;
 };
 
 struct Fonts {
@@ -46,6 +54,7 @@ struct Context {
     int screenWidth;
     int screenHeight;
     Screen currentScreen;
+    Sounds sounds;
     std::vector<WordList> wordsLists;
     int selectedWordList = 0;
     std::string sentence;
@@ -53,6 +62,7 @@ struct Context {
     double testStartTime = 0;
     bool testRunning = false;
     double testEndTime = 0;
+    bool soundOn = true;
     int wpm = 0;
     int cpm = 0;
     int raw = 0;
@@ -63,6 +73,7 @@ struct Context {
     Fonts fonts;
     std::vector<Theme> themes;
     int selectedTheme = 2;
+    CursorStyle cursorStyle = CursorStyle::BLOCK;
     TestSettings testSettings;
     bool mouseOnClickable = false;
     void load();
