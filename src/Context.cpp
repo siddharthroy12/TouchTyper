@@ -134,11 +134,8 @@ void Context::load() {
     this->soundOn = loadStorageValue(7, 1);
 }
 
-void Context::unload() {
-    UnloadFont(this->fonts.typingTestFont.font);
-    UnloadFont(this->fonts.tinyFont.font);
-    UnloadFont(this->fonts.bigFont.font);
-
+void Context::saveSettings() {
+    std::cout << "Settings saved" << std::endl;
     saveStorageValue(0, this->selectedTheme);
     saveStorageValue(1, this->selectedWordList);
     saveStorageValue(2, this->testSettings.selectedAmount);
@@ -147,5 +144,12 @@ void Context::unload() {
     saveStorageValue(5, (int)this->testSettings.testMode);
     saveStorageValue(6, (int)this->cursorStyle);
     saveStorageValue(7, this->soundOn);
+}
+
+void Context::unload() {
+    UnloadFont(this->fonts.typingTestFont.font);
+    UnloadFont(this->fonts.tinyFont.font);
+    UnloadFont(this->fonts.bigFont.font);
+    this->saveSettings();
 }
 

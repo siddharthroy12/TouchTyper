@@ -225,9 +225,32 @@ bool getFileContent(std::string fileName, std::vector<std::string> & vecOfStrs) 
     return true;
 }
 
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+EM_JS(int, getStorageBrowser, (int position), {
+  return localStorage.getItem(position);
+});
+
+EM_JS(void, setStorageBrowserDefault, (int position, int defaultValue), {
+  if (localStorage.getItem(position) === null) {
+    localStorage.setItem(position, defaultValue);
+  }
+});
+
+EM_JS(void, setStorageBrowser, (unsigned int position, int value), {
+  console.log("Setting value " + position + " " + value);
+  localStorage.setItem(position, value);
+});
+#endif
+
+
 // Save integer value to storage file (to defined position)
 // NOTE: Storage positions is directly related to file memory layout (4 bytes each integer)
 bool saveStorageValue(unsigned int position, int value) {
+#if defined(PLATFORM_WEB)
+    setStorageBrowser(position, value);
+    return true;
+#endif
     bool success = false;
     unsigned int dataSize = 0;
     unsigned int newDataSize = 0;
@@ -285,8 +308,12 @@ bool saveStorageValue(unsigned int position, int value) {
 }
 
 // Load integer value from storage file (from defined position)
-// NOTE: If requested position could not be found, value 0 is returned
+// NOTE: If requested position could not be found, value defaultValue is returned
 int loadStorageValue(unsigned int position, int defaultValue) {
+#if defined(PLATFORM_WEB)
+    setStorageBrowserDefault(position, defaultValue);
+    return getStorageBrowser(position);
+#endif
     int value = defaultValue;
     unsigned int dataSize = 0;
     const char *filePath = TextFormat("%s%s", GetApplicationDirectory(), STORAGE_DATA_FILE);

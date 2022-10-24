@@ -129,6 +129,10 @@ void loop() {
     }
     context.mouseOnClickable = false;
 
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        context.saveSettings();
+    }
+
     if (IsKeyPressed(KEY_ENTER)) {
         restartTest(context, IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
     }

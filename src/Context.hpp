@@ -78,6 +78,8 @@ struct Context {
     bool mouseOnClickable = false;
     void load();
     void unload();
+
+    void saveSettings();
 };
 
 #endif
