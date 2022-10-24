@@ -6,7 +6,7 @@
 
 I practice typing a lot and I've been using monkey type for long time but that website does not work smoothly on my low-end laptop and I can't use it when I don't have internet so I made my own typing test program using C++.
 
-You can download it from the [releases](https://github.com/siddharthroy12/TouchTyper/releases) page or just visit the [website](https://siddharthroy12.github.io/TouchTyper/) to run it on your browser.
+You can download it from the [releases](https://github.com/siddharthroy12/TouchTyper/releases) page or just visit the [website](https://touchtyper.netlify.app/) to run it on your browser.
 
 # Build Instructions
 
@@ -19,7 +19,7 @@ You can download it from the [releases](https://github.com/siddharthroy12/TouchT
 1. Install the raylib git submodule using `git submodule update --init --recursive --depth=1`
 1. Make a build folder. Your builds will go here. `mkdir build; cd build`
 1. Setup cmake `emcmake cmake -S .. -D CMAKE_BUILD_TYPE=Release`
-1. Run `cmake --build build` to compile the project
+1. Run `cmake --build .` to compile the project
 1. Run a local web server and open the TouchTyper.html
 
 ## Building (Linux/macOS)
