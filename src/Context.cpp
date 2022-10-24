@@ -131,7 +131,12 @@ void Context::load() {
     this->testSettings.useNumbers = loadStorageValue(4, 0);
     this->testSettings.testMode = (TestMode)loadStorageValue(5, 0);
     this->cursorStyle = (CursorStyle)loadStorageValue(6, 0);
+
     this->soundOn = loadStorageValue(7, 1);
+
+    #if defined(PLATFORM_WEB)
+    this->soundOn = 0; // On web sound won't start playing until the user clicks on the page
+    #endif
 }
 
 void Context::saveSettings() {
